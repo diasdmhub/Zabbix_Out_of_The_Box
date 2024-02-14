@@ -17,4 +17,4 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ### Issues
 
-- [Regular Expression escaping](./regular_expression/regex_escaping.md)
+- [Regular Expression escaping](./issue/regex_escaping.md)
