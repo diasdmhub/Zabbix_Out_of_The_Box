@@ -13,7 +13,7 @@ Keep in mind that JavaScript preprocessing uses a function body and the input va
 
 <BR>
 
-## REMOVE PROPERTYS FROM JSON OBJECTS
+## REMOVE PROPERTIES FROM JSON OBJECTS
 
 JSON data is perfect for creating dependent items. However, sometimes the raw JSON is unprepared for processing. So, JavaScript preprocessing can be used to remove object properties from the collected data. This can have some advantages depending on your scenario.
 
