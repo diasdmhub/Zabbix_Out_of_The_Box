@@ -69,7 +69,7 @@ Consider a Zabbix item that collects a JSON array with properties that represent
 [{"endTime":"20240202101020","startTime":"20240202101010"},{"endTime":"20240202101030","startTime":"20240202101010"},{"endTime":"20240202100920","startTime":"20240202101010"}]
 ```
 
-![JSON raw string](./image/json_raw_string2.png)
+![JSON raw string](./image/js_addkey_raw_string.png)
 
 <BR>
 
@@ -97,7 +97,7 @@ for (var i = 0; i < jsonValue.length; i++) {
 return JSON.stringify(jsonValue);
 ```
 
-![JavaScript code](./image/javascript_addkey_code.png)
+![JavaScript code](./image/js_addkey_code.png)
 
 <BR>
 
@@ -136,7 +136,7 @@ d. The code returns the modified `jsonValue` object as a JSON string using `JSON
 ]
 ```
 
-![Key removed from JSON](./image/json_key_added.png)
+![Key removed from JSON](./image/js_addkey_key_added.png)
 
 <BR>
 
