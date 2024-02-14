@@ -1,4 +1,4 @@
-| [↩️ Back](../) |
+| [↩️ Back](./) |
 | --- |
 
 # ADD PROPERTIES INTO JSON OBJECTS
