@@ -22,10 +22,10 @@ So, let's dive into the problem.
 
 When using the `find` function with a regular expression and trying to escape a period (**.**) character, Zabbix displays an incorrect parameter error. Using the `Zabbix server: Version` item as an example, we can verify this behavior.
 
-**1.** First, we can see that the Zabbix Server version item has the string `6.4.11`.
+#### 1. First, we can see that the Zabbix Server version item has the string `6.4.11`.
 ![Zabbix Server Version string](./image/zabbix_server_version.png)
 
-**2.** When attempting to create a calculated item that searches this string, Zabbix displays an incorrect expression error if the backslash escape character (**\\**) is used with the period (**.**) character.
+#### 2. When attempting to create a calculated item that searches this string, Zabbix displays an incorrect expression error if the backslash escape character (**\\**) is used with the period (**.**) character.
 ```
 find(/Zabbix server/zabbix[version],,"regexp","^6\.4")
 ```
@@ -49,7 +49,7 @@ Invalid parameter "/1/expression": incorrect expression starting from "find(/zbx
 
 <BR>
 
-**3.** The expression is considered valid if two backslashes are used, but the result is false (`= 0`) because the actual backslash character is escaped.
+#### 3. The expression is considered valid if two backslashes are used, but the result is false (`= 0`) because the actual backslash character is escaped.
 ```
 find(/APP Zabbix Proxy/zabbix[version],,"regexp","^6\\.4")
 ```
@@ -66,7 +66,8 @@ find(/APP Zabbix Proxy/zabbix[version],,"regexp",'^6[.]2')
 
 <BR>
 
-**4.** I've also tried messing with Zabbix DB to force the backslash character in the expression. \
+#### 4. I've also tried messing with Zabbix DB to force the backslash character into the expression.
+
 My test item has the following parameter in Zabbix DB after creating it without the backslash character.
 ```sql
 mysql> select params from items where itemid=44280;
