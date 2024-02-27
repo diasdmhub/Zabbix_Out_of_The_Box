@@ -17,6 +17,13 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 <BR>
 
+### Aggregation
+
+- [Aggregations](./aggregation/)
+  - [Count unique strings from items](./aggregation/count_unique_strings_items.md)
+
+<BR>
+
 ### Issues
 
 - [Regular Expression escaping](./issue/regex_escaping.md)
