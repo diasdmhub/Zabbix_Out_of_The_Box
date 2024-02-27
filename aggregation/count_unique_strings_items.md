@@ -1,4 +1,4 @@
-| [↩️ Back](../) |
+| [↩️ Back](./) |
 | --- |
 
 # COUNT UNIQUE STRINGS FROM MULTIPLE ITEMS
