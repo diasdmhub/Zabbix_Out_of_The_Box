@@ -15,7 +15,7 @@ If a monitored host is configured with a DNS name as its interface, Zabbix Serve
 
 The same applies to the Zabbix Agent. If the `Server` or `ServerActive` parameter is set up to a hostname/domain name, the Agent queries the DNS server too many times.
 
-This is most likely due to a lack of DNS caching by Zabbix processes. We can easily observe a DNS server query log and see how many queries Zabbix makes.
+This is most likely due to a lack of DNS caching by Zabbix processes, and we can easily observe a DNS server query log and see how many queries Zabbix makes.
 
 ![Zabbix Server Top Queries](./image/zabbix_top_queries.png)
 
@@ -83,15 +83,21 @@ Follow the steps below to observe the unwanted behavior.
 
 ![Zabbix Agent DNS log](./image/zabbix_ag_active_log.png)
 
+**2.** We can see 20 requests in the span of 1 minute.
+
 <BR>
 
 ## Workarounds
 
 At the time of this writing, no fix has been released for Zabbix regarding this issue. So some options may help to reduce the number of DNS queries from Zabbix applications.
 
+<BR>
+
 ### Domain Name to IP Address
 
 The most obvious workaround is to replace the domain name with the corresponding IP address. For the Zabbix Server this should be done in the host configuration where the interface is set to "IP Address". For the Zabbix Agent, the `Server` or `ServerActive` parameters must be set to an IP addresses. This will eliminate the need for DNS lookups.
+
+<BR>
 
 ### Hosts File
 
@@ -105,13 +111,16 @@ echo '192.168.7.12 zabbixserver.domain.name' >> /etc/hosts
 
 From then on, the Agent will perform a name lookup in the `hosts` file first.
 
+<BR>
+
 ### Local caching system
 
 If the host supports it, it is possible to include a local DNS caching system to prevent it from making too many requests.
 
-⚠️ **Despite the benefits of such systems, it seems that some applications can bypass the host's cache, and Zabbix may be one of them. However, this is unconfirmed for Zabbix and could not be validade.**
-https://access.redhat.com/solutions/916353
-https://access.redhat.com/solutions/905483
+> **⚠️**
+> **Despite the benefits of such systems, it seems that [some applications can bypass](https://access.redhat.com/solutions/916353) the host's cache, and Zabbix may be one of them. This is unconfirmed for Zabbix and could not be validated. However, the tests below show that it may be true.**
+
+<BR>
 
 #### 1. NSCD
 
@@ -123,7 +132,7 @@ To install NSCD, it is recommended to use the OS package manager, as most Linux 
 dnf install -y nscd
 ```
 
-After installing NSCD, [the default configuration](https://linux.die.net/man/5/nscd.conf) is located in `/etc/nscd.conf` and it should be customized to ensure that it works optimally in your environment. For more help, see `man 5 nscd.conf`.
+After installing NSCD, [the default configuration file](https://linux.die.net/man/5/nscd.conf) is located in `/etc/nscd.conf` and it should be customized to ensure that it works optimally in your environment. For more help, see `man 5 nscd.conf`.
 
 To start NSCD, use the SystemD service manager.
 
@@ -131,7 +140,9 @@ To start NSCD, use the SystemD service manager.
 systemctl enable --now nscd
 ```
 
-While testing, the Zabbix Agent kept resquesting the Server's name to the DNS server.
+> _While testing, with the system active and caching, the Zabbix Agent kept resquesting the Server's name to the DNS server._
+
+<BR>
 
 #### 2. Systemd-resolved
 
@@ -143,13 +154,15 @@ It is available in the repositories of many Linux distributions. To install it, 
 dnf install -y systemd-resolved
 ```
 
-Then, start it.
+The [main configuration file](https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html) is located at `/etc/systemd/resolved.conf` and it should be customized to ensure that it works optimally in your environment.
+
+To start Systemd-resolved, use the SystemD service manager.
 
 ```shell
 systemctl enable --now systemd-resolved
 ```
 
-This system could not be verified.
+> _While testing, with the system active and caching, the Zabbix Agent kept resquesting the Server's name to the DNS server._
 
 <BR>
 
