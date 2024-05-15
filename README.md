@@ -9,6 +9,12 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ## CONTENTS
 
+### Install
+
+- [Installation check-list](./install/)
+
+<BR>
+
 ### Codes
 
 - [JavaScript Preprocessing](./javascript_preprocessing/)
@@ -27,3 +33,4 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 ### Issues
 
 - [Regular Expression escaping](./issue/regex_escaping.md)
+- [Analysis of Zabbix DNS Queries](./issue/zabbix_dns_query.md)
