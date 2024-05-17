@@ -5,7 +5,7 @@
 
 It is advisable to plan ahead when deploying Zabbix in a production environment. [The official documentation](https://www.zabbix.com/documentation/current/en) is always the main source of information.
 
-These are common steps to deploy a stable Zabbix monitoring environment. They are not in any particular order, but in a logical manner from a requeriments perspective from one step to another.
+To help planning the environment, these are common steps to reach a stable Zabbix monitoring environment. They are not in any particular order, but in a logical manner from a requeriments perspective from one step to another.
 
 <BR>
 
@@ -22,9 +22,7 @@ These are common steps to deploy a stable Zabbix monitoring environment. They ar
 |                    | | _Define and share responsabilities_ |
 |                    | | _Define the architecture_ |
 |                    | | _Define the schedule_ |
-
-| **Status** | **Activity** | **Comment\*** |
-| :---: | --- | :--- |
+| <BR>               | | |
 | 📅 | [**Zabbix installation steps**](https://www.zabbix.com/documentation/current/en/manual/installation/getting_zabbix) |
 |                    | ✅ Deploy server(s) | |
 |                    | ✅ Server access | `ssh user@host` |
@@ -36,8 +34,8 @@ These are common steps to deploy a stable Zabbix monitoring environment. They ar
 |                    | ✅ DBMS deployment | |
 |                    | ✅ [Minimum DBMS security configuration](https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/) | `mysql_secure_installation` |
 |                    | ✅ Advanced DBMS security configuration | _ask the DBA_ |
-|                    | ✅ [Zabbix database ](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) | |
-|                    | ✅ Zabbix database user  | |
+|                    | ✅ [Zabbix database creation](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) | |
+|                    | ✅ Zabbix database user creation | |
 |                    | ✅ Zabbix Server installation | |
 |                    | ✅ Zabbix Server configuration | |
 |                    | ✅ Zabbix Frontend installation | |
@@ -50,28 +48,22 @@ These are common steps to deploy a stable Zabbix monitoring environment. They ar
 |                    | ✅ [Domain access configuration](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/authentication) | _LDAP_ |
 |                    | ✅ Custom DNS name | _DNS server_ |
 |                    | ✅ Frontend SSL certificate deployment | |
-|                    | ✅ [Super admin user ](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups/permissions) | |
+|                    | ✅ [Super admin user definition](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups/permissions) | |
 |                    | ✅ [Initial template customization](https://www.zabbix.com/documentation/current/en/manual/config/templates) | |
 |                    | ✅ Zabbix Agent metadata definition | |
-|                    | ✅ [Autoregistration rule](https://www.zabbix.com/documentation/current/en/manual/config/notifications/action) | |
-|                    | ✅ [Custom midia](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/alerts/mediatypes) | |
-
-| **Status** | **Activity** | **Comment\*** |
-| :---: | --- | :--- |
+|                    | ✅ [Autoregistration rule creation](https://www.zabbix.com/documentation/current/en/manual/config/notifications/action) | |
+|                    | ✅ [Custom midia setup](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/alerts/mediatypes) | |
+| <BR>               | | |
 | 📅 | [**Initial dashboard**](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/dashboards) | |
 |                    | ✅ Update the Zabbix Server dashboard | |
 |                    | ✅ Monitor the Zabbix DBMS | |
 |                    | ✅ Monitor the Zabbix Frontend | |
-
-| **Status** | **Activity** | **Comment\*** |
-| :---: | --- | :--- |
+| <BR>               | | |
 | 📅 | **Maintenance instructions and host deployment** | |
 |                    | ✅ [Zabbix Agent installation guide](https://www.zabbix.com/documentation/current/en/manual/concepts/agent) | _Agent 2 prefered_ |
 |                    | ✅ [Zabbix Agent Autoregistration guide](https://www.zabbix.com/documentation/6.4/en/manual/discovery/auto_registration) | |
-|                    | ✅ Train operations and users | |
-
-| **Status** | **Activity** | **Comment\*** |
-| :---: | --- | :--- |
+|                    | ✅ Train operators and users | |
+| <BR>               | | |
 | 📅 | **Monitoring environment** | |
 |                    | ⏳ Build the monitoring | |
 
