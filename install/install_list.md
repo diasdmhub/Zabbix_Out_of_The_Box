@@ -65,7 +65,7 @@ To help planning the environment, these are common steps to reach a stable Zabbi
 |                    | ✅ Train operators and users | |
 | <BR>               | | |
 | 📅 | **Monitoring environment** | |
-|                    | ⏳ Build the monitoring | |
+|                    | ⏳ Build the monitoring environment | |
 
 ---
 
