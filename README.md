@@ -11,22 +11,22 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ### Install
 
-- [Installation check-list](./install/)
+- [Installation check-list](./install/install_list.md)
 
 <BR>
 
 ### Codes
 
 - [JavaScript Preprocessing](./javascript_preprocessing/)
-  - [JavaScript Add Property](./javascript_preprocessing/javascript_add_property.md)
-  - [JavaScript Remove Property](./javascript_preprocessing/javascript_remove_property.md)
+    - [JavaScript Add Property](./javascript_preprocessing/javascript_add_property.md)
+    - [JavaScript Remove Property](./javascript_preprocessing/javascript_remove_property.md)
 
 <BR>
 
 ### Aggregation
 
 - [Aggregations](./aggregation/)
-  - [Count unique strings from items](./aggregation/count_unique_strings_items.md)
+    - [Count unique strings from items](./aggregation/count_unique_strings_items.md)
 
 <BR>
 
