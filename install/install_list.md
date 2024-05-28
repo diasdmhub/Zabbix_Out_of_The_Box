@@ -5,7 +5,7 @@
 
 It is advisable to plan ahead when deploying Zabbix in a production environment, and [the official documentation](https://www.zabbix.com/documentation/current/en) is always the main source of information.
 
-To help planning the environment, these are common steps to reach a stable Zabbix monitoring environment. They are not in any particular order, but in a logical manner from a requeriments perspective from one step to another.
+To help plan the environment, these are common steps to achieve a stable Zabbix monitoring environment. They are not in any particular order, but rather a logical progression from one step to the next from a requirements perspective.
 
 <BR>
 
