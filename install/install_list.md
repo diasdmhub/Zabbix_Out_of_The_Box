@@ -13,7 +13,7 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 
 | **Status**         | **Activity**                                     | **Remark\*** |
 | :---:              | ---                                              | :--- |
-| 📅                 | **Documentation (this repository)**              | |
+| 📅                 | **Documentation**                                | _This repository_ |
 |                    | ✅ Document the project                          | ⚠️ **Always** |
 | <BR> | | |                                                            
 | 📅                 | **Plan the environment**                         | |
@@ -36,20 +36,20 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 |                    | ✅ [Minimum DBMS security configuration](https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/) | `mysql_secure_installation` |
 |                    | ✅ Advanced DBMS security configuration          | _ask the DBA_ |
 |                    | ✅ [Zabbix database creation](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) | |
-|                    | ✅ Zabbix database user creation                 | |
+|                    | ✅ Zabbix database user creation                 | _Different user for each Zabbix component_ |
 |                    | ✅ Zabbix Server installation                    | |
 |                    | ✅ Zabbix Server configuration                   | |
 |                    | ✅ Zabbix Frontend installation                  | |
 |                    | ✅ Zabbix Frontend configuration                 | |
 |                    | ✅ Zabbix Proxy installation                     | |
 |                    | ✅ Zabbix Proxy configuration                    | |
-|                    | ✅ Zabbix Agent localhost installation           | |
+|                    | ✅ Zabbix Agent localhost installation           | _To all Zabbix servers_ |
 |                    | ✅ [Secure the setup](https://www.zabbix.com/documentation/current/en/manual/installation/requirements/best_practices) | |
 |                    | ✅ [Local access configuration](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups) | |
 |                    | ✅ [Domain access configuration](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/authentication) | _LDAP_ |
 |                    | ✅ Custom DNS name                               | _DNS server_ |
 |                    | ✅ Frontend SSL certificate deployment           | |
-|                    | ✅ [Super admin user definition](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups/permissions) | |
+|                    | ✅ [Super admin user definition](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups/permissions) | _Define those responsible_ |
 |                    | ✅ [Initial template customization](https://www.zabbix.com/documentation/current/en/manual/config/templates) | |
 |                    | ✅ Zabbix Agent metadata definition              | |
 |                    | ✅ [Autoregistration rule creation](https://www.zabbix.com/documentation/current/en/manual/config/notifications/action) | |
