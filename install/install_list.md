@@ -3,7 +3,7 @@
 
 # ZABBIX INSTALLATION STEPS
 
-It is advisable to plan ahead when deploying Zabbix in a production environment, and [the official documentation](https://www.zabbix.com/documentation/current/en) is always the main source of information.
+It is advisable to plan ahead when deploying Zabbix in a production environment, and [the official documentation](https://www.zabbix.com/documentation/current/en) is always the main reference for concepts and procedures.
 
 To help plan the environment, these are common steps to achieve a stable Zabbix monitoring environment. They are not in any particular order, but rather a logical progression from one step to the next from a requirements perspective.
 
@@ -62,7 +62,7 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 | <BR> | | |
 | 📅                 | **Maintenance instructions and host deployment** | |
 |                    | ✅ [Zabbix Agent installation guide](https://www.zabbix.com/documentation/current/en/manual/concepts/agent) | _Agent 2 prefered_ |
-|                    | ✅ [Zabbix Agent Autoregistration guide](https://www.zabbix.com/documentation/6.4/en/manual/discovery/auto_registration) | |
+|                    | ✅ [Zabbix Agent Autoregistration guide](https://www.zabbix.com/documentation/current/en/manual/discovery/auto_registration) | |
 |                    | ✅ Train operators and users                     | |
 | <BR> | | |
 | 📅                 | **Monitoring environment**                       | |
@@ -80,5 +80,5 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 
 <BR>
 
-| [⬆️ Top](#zabbix-monitoring-backlog-list) |
+| [⬆️ Top](#zabbix-installation-steps) |
 | --- |
