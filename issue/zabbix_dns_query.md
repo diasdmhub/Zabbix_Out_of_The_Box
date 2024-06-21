@@ -11,7 +11,7 @@ This is a detailed analysis of the behavior of the Zabbix Server and Agent when 
 
 ## Context
 
-If a monitored host is configured with a DNS name as its interface, Zabbix Server will start querying this name too often, even if the host has a reasonable update interval for its items. Once the host is configured with its DNS name, the Server starts making at least 2 queries for each item it updates. Thus, the number of queries can increase quickly if the host has many items.
+If a monitored host is configured with a DNS name as its interface, Zabbix Server will start querying this name too often, even if the host has a reasonable update interval for its items. Once the host is configured with its DNS name, the Server starts making at least 2 queries for each item it updates, taking into account IPv4 and IPv6. Thus, the number of queries can increase quickly if the host has many items.
 
 The same applies to the Zabbix Agent. If the `Server` or `ServerActive` parameter is set up to a hostname/domain name, the Agent queries the DNS server too many times.
 
