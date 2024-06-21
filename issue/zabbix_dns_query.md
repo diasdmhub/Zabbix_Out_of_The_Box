@@ -95,7 +95,7 @@ At the time of this writing, no fix has been released for Zabbix regarding this 
 
 ### Domain Name to IP Address
 
-The most obvious workaround is to replace the domain name with the corresponding IP address. For the Zabbix Server this should be done in the host configuration where the interface is set to "IP Address". For the Zabbix Agent, the `Server` or `ServerActive` parameters must be set to an IP addresses. This will eliminate the need for DNS lookups.
+The most obvious workaround is to replace the domain name with the corresponding IP address. For the Zabbix Server, this should be done in the host configuration where the interface is set to `IP Address` type. For the Zabbix Agent, the `Server` or `ServerActive` parameter must be set to the Server IP address. This eliminates the need for DNS lookups.
 
 <BR>
 
@@ -109,13 +109,13 @@ Basically, you can append a new line to the `/etc/hosts` file of the monitored h
 echo '192.168.7.12 zabbixserver.domain.name' >> /etc/hosts
 ```
 
-From then on, the Agent will perform a name lookup in the `hosts` file first.
+From then on, the Agent will perform a name lookup in the `hosts` file first, not in the DNS server.
 
 <BR>
 
 ### Local caching system
 
-If the host supports it, it is possible to include a local DNS caching system to prevent it from making too many requests.
+If the host supports it, it is possible to include a local DNS caching system to prevent it from making too many requests to the DNS server.
 
 > **⚠️**
 > **Despite the benefits of such systems, it seems that [some applications can bypass](https://access.redhat.com/solutions/916353) the host's cache, and Zabbix may be one of them. This is unconfirmed for Zabbix and could not be validated. However, the tests below show that it may be true.**
