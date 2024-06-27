@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # SCRIPT TO CREATE A POD AND ZABBIX CONTAINERS
 # by diasdm
 
