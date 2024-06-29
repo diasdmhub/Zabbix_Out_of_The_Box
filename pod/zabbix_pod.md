@@ -70,7 +70,7 @@ There are other differences between Podman and Docker, but this proposal is main
 
 **1.** The script first creates a Pod called `zabbix[VERSION]pod`.
 
-**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed after its creation. With it, some volumes are associated for the database, Zabbix Server and Agent files, like shown bellow.
+**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed once it is created. It has some volumes are associated with it for the database, Zabbix Server and Agent files, allowing for some data persistence.
 
 ```shell
 [user@host ~]$ tree zabbixpod/
@@ -94,11 +94,11 @@ zabbixpod/
 
 **5.** Next, Zabbix component containers are created all binded to the `localhost` address of the Pod as a shared network name space. They are:
 
-- Zabbix Server
-- Zabbix Web Frontend
-- Zabbix SNMPTraps
-- Zabbix Web Service
-- Zabbix Agent 2
+- `Zabbix Server`
+- `Zabbix Web Frontend`
+- `Zabbix SNMPTraps`
+- `Zabbix Web Service`
+- `Zabbix Agent 2`
 
 **6.** The first time the Pod is launched, it may take about 2 minutes to be able access the Zabbix Frontend while the database is being created.
 
