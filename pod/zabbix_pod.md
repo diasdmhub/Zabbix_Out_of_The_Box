@@ -87,7 +87,7 @@ zabbixpod/
 
 **3.** The Pod also binds some ports for Zabbix to receive connections.
 - `8080/TCP` for Web access to Zabbix Frontend.
-- `10051/TCP` for hosts to connect to Zabbix Server.
+- `10051/TCP` for hosts to connect to Zabbix Server.
 - `1162/UDP` for Zabbix to receive SNMP traps.
 
 **4.** Following the Pod, a MySQL container is created. It is not binded to a routable network accessible from outside the Pod. Its credentials are set in the first variable set.
@@ -100,7 +100,7 @@ zabbixpod/
 - `Zabbix Web Service`
 - `Zabbix Agent 2`
 
-**6.** The first time the Pod is launched, it may take about 2 minutes to be able access the Zabbix Frontend while the database is being created.
+**6.** The first time the Pod is launched, it may take about 2 minutes to be able to access the Zabbix Frontend while the database is being created.
 
 <BR>
 
