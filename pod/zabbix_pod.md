@@ -5,7 +5,7 @@
 
 Nowadays there are several reasons to use containers and some tools are available to manage them. [Podman](https://podman.io/) is such a tool, and besides Docker, it uses the [concept of Pods](https://kubernetes.io/docs/concepts/workloads/pods/), commonly used in Kubernetes.
 
-Zabbix SIA provides Docker images for each Zabbix component to run as a portable and self-sufficient container. Also, Docker Compose files are also available to define and run multi-container Zabbix components in Docker. Since Podman can use Docker images, it is easy to port them to a Pod context. One can even use the Docker compose file to launch Zabbix containers. However, the official compose files are not ready to run Pods.
+Zabbix SIA provides Docker images for each Zabbix component to run as a portable and self-sufficient container. Also, Docker Compose files are also available to define and run multi-container Zabbix components in Docker. Since Podman can use Docker images, it is easy to port them to a Pod context. One can even use the Docker compose file to launch Zabbix containers. However, out-of-the-box Podman is not ready to run the Docker compose files.
 
 There are multiple Zabbix components that are constantly communicating with each other. When deploying Zabbix components as containers, they must be tightly coupled and may need to share resources. With the Pod concept, these containers can form a single cohesive unit. So, to let Zabbix benefit from Podman's improvements, here's a simplified Pod proposal for Zabbix components in a Shell script format.
 
