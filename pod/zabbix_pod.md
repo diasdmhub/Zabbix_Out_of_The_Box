@@ -22,7 +22,7 @@ There are other differences between Podman and Docker, but this proposal is main
 
 ## Requirements
 
-> **Many distributions provide packages for Podman, including Windows.**
+> **Many distributions offer packages for Podman, including Windows. Yet, this is a Shell script designed to run in a Linux environment.**
 
 - 🛠️ [Install Podman](https://podman.io/docs/installation)
 - 🛠️ [Basic setup](https://github.com/containers/podman/blob/main/docs/tutorials/podman_tutorial.md)
@@ -70,7 +70,7 @@ There are other differences between Podman and Docker, but this proposal is main
 
 **1.** The script first creates a Pod called `zabbix[VERSION]pod`.
 
-**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed once it is created. It has some volumes are associated with it for the database, Zabbix Server and Agent files, allowing for some data persistence.
+**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed once it is created. It has some volumes associated with it for the database, Zabbix server, and agent files, which allows for some data persistence.
 
 ```shell
 [user@host ~]$ tree zabbixpod/
@@ -100,13 +100,13 @@ zabbixpod/
 - `Zabbix Web Service`
 - `Zabbix Agent 2`
 
-**6.** The first time the Pod is launched, it may take about 2 minutes to be able to access the Zabbix Frontend while the database is being created.
+**6.** The **first time** the Pod is launched, it may take **about 2 minutes to be able to access the Zabbix Frontend** while the database is being created.
 
 <BR>
 
 ## Test
 
-In a small environment, very few resources are required to run this type of Pod, as shown in the image below. However, long-term stability has not been verified, and your mileage may vary depending on your needs.
+In a small environment, very few resources are required to run this type of Pod, as shown in the image below. However, long-term stability has not been verified, and your mileage may vary depending on your requirements.
 
 ![Pod resources consumption](./image/resources.png)
 
@@ -157,7 +157,9 @@ e50937e52cd3  docker.io/zabbix/zabbix-server-mysql:ol-7.0-latest     /usr/sbin/z
 517a0b914587  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/zabbix_...  3 seconds ago  Up 3 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-agent2           436244a5c239  zabbix70pod
 ```
 
-> **Note that the Pod was created under a non-privileged user (`~`) and all data is stored this user's home directory.**
+> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored this user's home directory.**_
+
+The Zabbix Frontend should be accessible at `http://host.ip:8080`. The default user and password are `Admin` and `zabbix` respectively.
 
 <BR>
 
