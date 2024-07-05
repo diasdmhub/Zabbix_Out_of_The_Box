@@ -44,7 +44,7 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 |                    | ✅ Zabbix Proxy installation                     | |
 |                    | ✅ Zabbix Proxy configuration                    | |
 |                    | ✅ Zabbix Agent localhost installation           | _To all Zabbix servers_ |
-|                    | ✅ [Secure the setup](https://www.zabbix.com/documentation/current/en/manual/installation/requirements/best_practices) | |
+|                    | ✅ [Secure the setup](https://www.zabbix.com/documentation/current/en/manual/installation/best_practices) | |
 |                    | ✅ [Local access configuration](https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups) | |
 |                    | ✅ [Domain access configuration](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/authentication) | _LDAP_ |
 |                    | ✅ Custom DNS name                               | _DNS server_ |
