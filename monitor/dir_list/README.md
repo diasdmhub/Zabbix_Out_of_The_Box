@@ -26,6 +26,7 @@ This is a simple template that discovers multiple files in a directory. It is ba
 
 ## Requirements
 
+- Template for Zabbix 7.0 or higher
 - Windows Zabbix Agent 6.0 or higher
 
 <BR>
