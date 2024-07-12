@@ -5,7 +5,7 @@
 
 <div align="right">
 
-[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./LICENSE)
+[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE)
 [![Version](https://img.shields.io/badge/Version-701-blue?logo=AdGuard&color=0aa8d2)](./windows_file_by_zabbix_agent.yaml)
 
 </div>
