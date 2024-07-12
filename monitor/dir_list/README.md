@@ -20,7 +20,7 @@ It would be nice if this could be handled by a discovery rule with its correspon
 
 At first glance, you might think that there are no possible keys to find multiple files that span to multiple directories. After all, the `vfs.file.get` item key can only handle one file, and `vfs.dir.get` can only traverse one directory, which in principle makes sense. But note that "_traverse_" is the key word. `vfs.dir.get` key can traverse a directory. So the higher up you go in a file system tree, the broader you can traverse.
 
-So this is a simple template that discovers multiple files in a directory. It is based on the `vfs.dir.get` item key, which returns the file sizes right away, with some macros to make it somewhat flexible. Of course, you will need to customize it for your own scenario, and for files in different directories, you will need some flexible regular expressions. Macros are provided for such flexibility.
+This is a simple template that discovers multiple files in a directory. It is based on the `vfs.dir.get` item key, which returns the file sizes right away, and some macros to make it somewhat flexible. Of course, you will need to customize it for your own scenario, and for files in different directories, you will need some flexible regular expressions. Macros are provided for such flexibility.
 
 <BR>
 
