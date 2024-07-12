@@ -1,0 +1,88 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: 2257eb5c89bf4d9d8c0b64ec3e2888ae
+      template: 'Windows Files by Zabbix agent'
+      name: 'Windows Files by Zabbix agent'
+      description: 'Windows template to discover specific files from a specific directory'
+      vendor:
+        name: diasdm
+        version: 7.0-1
+      groups:
+        - name: Templates/Modules
+      items:
+        - uuid: 2fab351a624f44109a8fc1b57448f29b
+          name: 'Windows Files Listing'
+          key: 'vfs.dir.get["{$ENTRY.DIR.MATCHES}",{$ENTRY.NAME.MATCHES},{$ENTRY.NAME.NOT_MATCHES},{$ENTRY.TYPE.MATCHES},{$ENTRY.TYPE.NOT_MATCHES},{$ENTRY.MAX.DEPTH},,,,,{$ENTRY.DIR.NOT_MATCHES}]'
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Windows file listing to be discovered
+            Parameters should be set in host macros.
+            For more information about this item key, see the documentation
+          tags:
+            - tag: Files
+              value: list
+      discovery_rules:
+        - uuid: 1e537759d67a4f7eb20c78f18da04c0f
+          name: 'Windows File Discovery'
+          type: DEPENDENT
+          key: entry.file.discovery
+          delay: '0'
+          lifetime: 1d
+          enabled_lifetime_type: DISABLE_AFTER
+          enabled_lifetime: 1h
+          description: 'Discovery of files within a directory'
+          item_prototypes:
+            - uuid: e07eebc57de84c118c702470afc70e7b
+              name: 'Windows File Size - {#ENTRY.NAME}'
+              type: DEPENDENT
+              key: 'vfs.dir.get.file[{#ENTRY.NAME}]'
+              delay: '0'
+              history: 30d
+              units: B
+              description: 'Entry file size'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.basename == ''{#ENTRY.NAME}'')].size.first()'
+              master_item:
+                key: 'vfs.dir.get["{$ENTRY.DIR.MATCHES}",{$ENTRY.NAME.MATCHES},{$ENTRY.NAME.NOT_MATCHES},{$ENTRY.TYPE.MATCHES},{$ENTRY.TYPE.NOT_MATCHES},{$ENTRY.MAX.DEPTH},,,,,{$ENTRY.DIR.NOT_MATCHES}]'
+              tags:
+                - tag: Size
+                  value: '{#ENTRY.NAME}'
+          master_item:
+            key: 'vfs.dir.get["{$ENTRY.DIR.MATCHES}",{$ENTRY.NAME.MATCHES},{$ENTRY.NAME.NOT_MATCHES},{$ENTRY.TYPE.MATCHES},{$ENTRY.TYPE.NOT_MATCHES},{$ENTRY.MAX.DEPTH},,,,,{$ENTRY.DIR.NOT_MATCHES}]'
+          lld_macro_paths:
+            - lld_macro: '{#ENTRY.DIR}'
+              path: $.dirname
+            - lld_macro: '{#ENTRY.NAME}'
+              path: $.basename
+            - lld_macro: '{#ENTRY.PATH}'
+              path: $.pathname
+            - lld_macro: '{#ENTRY.SIZE}'
+              path: $.size
+            - lld_macro: '{#ENTRY.TYPE}'
+              path: $.type
+      macros:
+        - macro: '{$ENTRY.DIR.MATCHES}'
+          description: 'Directory to be searched. Set at host level'
+        - macro: '{$ENTRY.DIR.NOT_MATCHES}'
+          description: 'Directory NOT to be searched'
+        - macro: '{$ENTRY.MAX.DEPTH}'
+          value: '0'
+          description: 'Maximum depth of subdirectories to traverse. -1 - unlimited, 0 - no descending into subdirectories.'
+        - macro: '{$ENTRY.NAME.MATCHES}'
+          description: 'File names to be listed. All if empty'
+        - macro: '{$ENTRY.NAME.NOT_MATCHES}'
+          description: 'File names NOT to be listed'
+        - macro: '{$ENTRY.TYPE.MATCHES}'
+          value: file
+          description: 'Type of entry to be listed'
+        - macro: '{$ENTRY.TYPE.NOT_MATCHES}'
+          description: 'Type of entry NOT to be listed'

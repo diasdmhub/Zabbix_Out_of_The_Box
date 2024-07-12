@@ -16,6 +16,12 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 <BR>
 
+### Templates
+
+- [Windows Files Discovery template](./monitor/dir_list/)
+
+<BR>
+
 ### Codes
 
 - [JavaScript Preprocessing](./javascript_preprocessing/)
