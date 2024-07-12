@@ -6,7 +6,7 @@
 <div align="right">
 
 [![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./LICENSE)
-[![Version](https://img.shields.io/badge/Version-701-blue?logo=AdGuard&color=0aa8d2)](./windows_files_by_zabbix_agent.yaml)
+[![Version](https://img.shields.io/badge/Version-701-blue?logo=AdGuard&color=0aa8d2)](./windows_file_by_zabbix_agent.yaml)
 
 </div>
 
@@ -31,7 +31,7 @@ This is a simple template that discovers multiple files in a directory. It is ba
 <BR>
 
 ---
-### ➡️ [Download](./windows_files_by_zabbix_agent.yaml)
+### ➡️ [Download](./windows_file_by_zabbix_agent.yaml)
 ---
 #### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
 ---
