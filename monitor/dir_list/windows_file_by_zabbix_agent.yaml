@@ -7,10 +7,10 @@ zabbix_export:
     - uuid: 2257eb5c89bf4d9d8c0b64ec3e2888ae
       template: 'Windows Files by Zabbix agent'
       name: 'Windows Files by Zabbix agent'
-      description: 'Template to discover specific files from a specific directory'
+      description: 'Windows template to discover specific files from a specific directory'
       vendor:
         name: diasdm
-        version: 7.0-0
+        version: 7.0-1
       groups:
         - name: Templates/Modules
       items:
@@ -18,10 +18,13 @@ zabbix_export:
           name: 'Windows Files Listing'
           key: 'vfs.dir.get["{$ENTRY.DIR.MATCHES}",{$ENTRY.NAME.MATCHES},{$ENTRY.NAME.NOT_MATCHES},{$ENTRY.TYPE.MATCHES},{$ENTRY.TYPE.NOT_MATCHES},{$ENTRY.MAX.DEPTH},,,,,{$ENTRY.DIR.NOT_MATCHES}]'
           delay: 5m
-          history: 2d
+          history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'File listing to be discovered'
+          description: |
+            Windows file listing to be discovered
+            Parameters should be set in host macros.
+            For more information about this item key, see the documentation
           tags:
             - tag: Files
               value: list
@@ -32,7 +35,8 @@ zabbix_export:
           key: entry.file.discovery
           delay: '0'
           lifetime: 1d
-          enabled_lifetime_type: DISABLE_NEVER
+          enabled_lifetime_type: DISABLE_AFTER
+          enabled_lifetime: 1h
           description: 'Discovery of files within a directory'
           item_prototypes:
             - uuid: e07eebc57de84c118c702470afc70e7b
