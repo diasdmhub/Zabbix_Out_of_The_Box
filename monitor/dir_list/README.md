@@ -81,5 +81,5 @@ This is a simple template that discovers multiple files in a directory. It is ba
 
 <BR>
 
-| [⬆️ Top](#directory-file-size-listing) |
+| [⬆️ Top](#zabbix-template-for-windows-files-discovery) |
 | --- |
