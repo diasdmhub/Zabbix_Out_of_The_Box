@@ -12,6 +12,9 @@ zabbix_export:
         
         By Diasdm
         https://github.com/diasdmhub/Zabbix_Out_of_The_Box
+      vendor:
+        name: diasdm
+        version: 7.0-2
       groups:
         - name: Templates/Applications
       items:
