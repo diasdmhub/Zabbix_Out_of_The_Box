@@ -19,6 +19,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 ### Templates
 
 - [Windows Files Discovery template](./monitor/dir_list/)
+- [Domain RDAP template](./monitor/rdap/)
 
 <BR>
 
