@@ -7,7 +7,11 @@ zabbix_export:
     - uuid: 2257eb5c89bf4d9d8c0b64ec3e2888ae
       template: 'Windows Files by Zabbix agent'
       name: 'Windows Files by Zabbix agent'
-      description: 'Windows template to discover specific files from a specific directory'
+      description: |
+        Windows template to discover specific files from a specific directory
+
+        By Diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box
       vendor:
         name: diasdm
         version: 7.0-1
