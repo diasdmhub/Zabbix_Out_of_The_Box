@@ -6,7 +6,7 @@
 <div align="right">
 
 [![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE)
-[![Version](https://img.shields.io/badge/Version-701-blue?logo=gitforwindows&color=0aa8d2)](./windows_file_by_zabbix_agent.yaml)
+[![Version](https://img.shields.io/badge/Version-701-blue?logo=zotero&color=0aa8d2)](./windows_file_by_zabbix_agent.yaml)
 
 </div>
 
