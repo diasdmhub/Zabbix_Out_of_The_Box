@@ -1,4 +1,4 @@
-| [↩️ Back](./) |
+| [↩️ Back](../) |
 | --- |
 
 # Zabbix Template for Domain RDAP
