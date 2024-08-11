@@ -1,0 +1,402 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 5c33544649434a729c18a150ad28bd41
+      template: 'Domain RDAP by HTTP'
+      name: 'Domain RDAP by HTTP'
+      description: |
+        RDAP domain name information
+        
+        By Diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 8a31077c27ba4ff9b552606c7ee10ddb
+          name: 'Domain Administrator Email'
+          type: DEPENDENT
+          key: 'rdap.domain.admin[email]'
+          history: 2d
+          value_type: CHAR
+          description: 'Indicates the domain administrator e-mail contact'
+          inventory_link: CONTACT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.entities..entities..vcardArray[1][?(@[0] == ''email'')][3].first()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Absent
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Admin
+              value: email
+            - tag: Domain
+              value: admin
+        - uuid: d74463b63c8440069ddb99161dbe78cf
+          name: 'Domain Administrator Name'
+          type: DEPENDENT
+          key: 'rdap.domain.admin[name]'
+          history: 2d
+          value_type: CHAR
+          description: 'Indicates the domain administrator name'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.entities..entities..vcardArray[1][?(@[0] == ''fn'')][3].first()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Absent
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Admin
+              value: name
+            - tag: Domain
+              value: admin
+        - uuid: f3e91a3e4fad4149a4682a1d9f88fbf4
+          name: 'Domain Administrator Telephone'
+          type: DEPENDENT
+          key: 'rdap.domain.admin[telephone]'
+          history: 2d
+          value_type: CHAR
+          description: 'Domain administrator telephone contact'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.entities..entities..vcardArray[1][?(@[0] == ''tel'')][3].first()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Absent
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Admin
+              value: telephone
+            - tag: Domain
+              value: admin
+        - uuid: 0b013214d1e141d89135de95a4101b74
+          name: 'Domain Date Expiration'
+          type: DEPENDENT
+          key: rdap.domain.expiration
+          history: 2d
+          trends: '0'
+          units: unixtime
+          description: 'Indicates the domain expiration date in UTC timezone'
+          inventory_link: DATE_HW_EXPIRY
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.events[?(@.eventAction =~ ''expiration'')].eventDate.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var unix_time = new Date(value).getTime();
+                  return Math.floor(unix_time / 1000);
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Date
+              value: expiration
+            - tag: Domain
+              value: date
+          triggers:
+            - uuid: be436e82083c4b77b51397daafdc1743
+              expression: |
+                (last(/Domain RDAP by HTTP/rdap.domain.expiration,#1)
+                - now())
+                <
+                {$RDAP.EXPIRY.THRESHOLD} * 86400
+              name: 'Domain Expires Soon'
+              event_name: 'Domain expires soon - Less than {$RDAP.EXPIRY.THRESHOLD} days to expire'
+              opdata: 'Due date: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Indicates that the domain will expire in less than {$RDAP.EXPIRY.THRESHOLD} days'
+              tags:
+                - tag: Expiration
+                  value: soon
+        - uuid: 5c9c109b1eb347988a0ecb1a3f6375f1
+          name: 'Domain Time to Expire'
+          type: CALCULATED
+          key: 'rdap.domain.expiration[timeleft]'
+          delay: 1d
+          history: 2d
+          trends: '0'
+          units: uptime
+          params: |
+            last(//rdap.domain.expiration,#1)
+            - now()
+          description: 'Indicates the time left for the domain to expire'
+          tags:
+            - tag: Date
+              value: time_left
+            - tag: Domain
+              value: date
+        - uuid: c4a1757d9c414a5d9bdbcae163f63887
+          name: 'Domain Date Last Changed'
+          type: DEPENDENT
+          key: rdap.domain.lastchanged
+          history: 2d
+          trends: '0'
+          units: unixtime
+          description: 'Indicates the domain last change date in UTC timezone'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.events[?(@.eventAction =~ ''last changed'')].eventDate.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var unix_time = new Date(value).getTime();
+                  return Math.floor(unix_time / 1000);
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Date
+              value: change
+            - tag: Domain
+              value: date
+          triggers:
+            - uuid: e33fc9bda28a4d45a100fe992c5d5d5d
+              expression: 'change(/Domain RDAP by HTTP/rdap.domain.lastchanged)=1'
+              name: 'Domain was Recently Changed'
+              event_name: 'Domain Was Changed Recently'
+              opdata: 'Last Changed Date: {{ITEM.LASTVALUE}.fmttime(%Y-%m-%d %H:%M:%S)}'
+              priority: WARNING
+              description: 'Indicates that the domain was recently changed'
+              tags:
+                - tag: Change
+                  value: recent
+        - uuid: 8c5e96b6b92c46fbb209be560f66fc50
+          name: 'Domain Name Server'
+          type: DEPENDENT
+          key: rdap.domain.nameserver
+          history: 2d
+          value_type: CHAR
+          description: 'Indicates the registered DNS server for the domain name'
+          inventory_link: SITE_ADDRESS_A
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nameservers..ldhName
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+            - type: RTRIM
+              parameters:
+                - ']'
+            - type: LTRIM
+              parameters:
+                - '['
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Domain
+              value: nameserver
+          triggers:
+            - uuid: 38e69cb8826448098eff65380fc5d702
+              expression: 'change(/Domain RDAP by HTTP/rdap.domain.nameserver)=1'
+              name: 'Domain Nameserver Changed'
+              opdata: 'New Nameserver: {ITEM.VALUE}'
+              priority: WARNING
+              description: 'Indicates that there was a change in the nameserver list'
+              manual_close: 'YES'
+              tags:
+                - tag: Nameserver
+                  value: changed
+        - uuid: 3e9a856c26084affa656b68c3a276d2c
+          name: 'Domain Date Registration'
+          type: DEPENDENT
+          key: rdap.domain.registration
+          history: 2d
+          trends: '0'
+          units: unixtime
+          description: 'Indicates the domain registration date in UTC timezone'
+          inventory_link: DATE_HW_PURCHASE
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.events[?(@.eventAction =~ ''registration'')].eventDate.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var unix_time = new Date(value).getTime();
+                  return Math.floor(unix_time / 1000);
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Date
+              value: registration
+            - tag: Domain
+              value: date
+        - uuid: be798bf816da4a06b845278d57be70c5
+          name: 'Domain Representative Identifier'
+          type: DEPENDENT
+          key: 'rdap.domain.representative[identifier]'
+          history: 2d
+          value_type: CHAR
+          description: 'Indicates the domain legal representative identifier'
+          inventory_link: VENDOR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.entities..publicIds..identifier.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Absent
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Domain
+              value: representative
+            - tag: Representative
+              value: identifier
+        - uuid: 495c5a66b13a465182f41e8660cfc54b
+          name: 'Domain Legal Representative Name'
+          type: DEPENDENT
+          key: 'rdap.domain.representative[legalname]'
+          history: 2d
+          value_type: CHAR
+          description: 'Indicates the domain legal representative'
+          inventory_link: INSTALLER_NAME
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.entities..legalRepresentative.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Absent
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Domain
+              value: representative
+            - tag: Representative
+              value: name
+        - uuid: ccc9442b1d394493a60a39b102eefe70
+          name: 'Domain Status'
+          type: DEPENDENT
+          key: rdap.domain.status
+          trends: '0'
+          description: |
+            Indicates the domain name status
+            Status are defined by RFC9083
+          inventory_link: DEPLOYMENT_STATUS
+          valuemap:
+            name: 'Domain Status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.status.first()
+            - type: REGEX
+              parameters:
+                - active
+                - '1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: rdap.json
+          tags:
+            - tag: Domain
+              value: status
+          triggers:
+            - uuid: 055f69765b074673bef69e636941eecf
+              expression: |
+                last(/Domain RDAP by HTTP/rdap.domain.status,#1)<>1
+                and
+                last(/Domain RDAP by HTTP/rdap.domain.status,#2)=1
+              name: 'Domain Status is Different than Active'
+              event_name: 'Domain Status is Different than Active'
+              opdata: 'Current Status: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: |
+                Indicates that the domain status was set as active and is not anymore
+                Status are defined by RFC9083
+              manual_close: 'YES'
+              tags:
+                - tag: Status
+                  value: inactive
+        - uuid: 325a86ddefea4b5d93234f4f216eb63c
+          name: 'RDAP Domain Registry JSON'
+          type: HTTP_AGENT
+          key: rdap.json
+          delay: 1d
+          history: '0'
+          value_type: TEXT
+          description: 'Retrieves raw JSON data from the RDAP server'
+          url: '{$RDAP.URL}/{$RDAP.DOMAIN.NAME}'
+          tags:
+            - tag: Registry
+              value: json
+      tags:
+        - tag: RDAP
+          value: registry
+      macros:
+        - macro: '{$RDAP.DOMAIN.NAME}'
+          description: 'Domain name to query'
+        - macro: '{$RDAP.EXPIRY.THRESHOLD}'
+          value: '60'
+          description: 'Threshold for domain to expire in days'
+        - macro: '{$RDAP.URL}'
+          value: 'https://rdap.org/domain'
+          description: 'The RDAP server URL'
+      valuemaps:
+        - uuid: 134e590293a64ceebdc2b8540e93beaf
+          name: 'Domain Status'
+          mappings:
+            - value: '1'
+              newvalue: Active
+            - type: DEFAULT
+              newvalue: Other
+  triggers:
+    - uuid: 183e52973beb4a4cbcbe6223be63af54
+      expression: |
+        change(/Domain RDAP by HTTP/rdap.domain.admin[email])=1
+        or
+        change(/Domain RDAP by HTTP/rdap.domain.admin[telephone])=1
+      name: 'Domain Administrator Contact Changed'
+      opdata: 'New contact: {ITEM.VALUE1} - {ITEM.VALUE2}'
+      priority: WARNING
+      description: 'Indicates that the representative contact changed'
+      manual_close: 'YES'
+      tags:
+        - tag: Contact
+          value: changed
+    - uuid: e8a22ae643464cd188fa5e0cdc70e5a6
+      expression: |
+        change(/Domain RDAP by HTTP/rdap.domain.representative[legalname])=1
+        or
+        change(/Domain RDAP by HTTP/rdap.domain.representative[identifier])=1
+      name: 'Domain Representative Changed'
+      opdata: 'Representative: {ITEM.VALUE1} - Identifier: {ITEM.VALUE2}'
+      priority: WARNING
+      description: |
+        Indicates that the domain legal representative changed
+        The domain may have been transfered
+      manual_close: 'YES'
+      tags:
+        - tag: Representative
+          value: changed
