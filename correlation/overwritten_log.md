@@ -1,4 +1,4 @@
-| [↩️ Back](../) |
+| [↩️ Back](./) |
 | --- |
 
 # Overwritten Log File
