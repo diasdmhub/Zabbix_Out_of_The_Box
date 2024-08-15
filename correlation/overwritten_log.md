@@ -150,7 +150,7 @@ It will close new repeating events immediately.
 
 ![Event resolved correlation](./image/event_resolved_correlation.png)
 
-One consideration is that the global correlation rule allows new events to be created. In reality, this is not an optimal solution. A best option would be not to create new events, but this option is not available at the time of this writing. In the end, this is all a contour solution. Nevertheless, it does solve the problem of multiple recurring open events.
+One consideration is that the global correlation rule allows new events to be created. In reality, this is not an optimal solution. A better option would be not to create new events, but this option is not available at the time of this writing. In the end, this is all a contour solution. Nevertheless, it does solve the problem of multiple recurring open events.
 
 <BR>
 
