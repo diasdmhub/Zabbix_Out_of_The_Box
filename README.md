@@ -38,6 +38,13 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 <BR>
 
+### Event Correlation
+
+- [Event Correlation](./correlation/)
+    - [Overwritten Log File](./correlation/overwritten_log.md)
+
+<BR>
+
 ### Issues
 
 - [Regular Expression escaping](./issue/regex_escaping.md)
