@@ -12,7 +12,6 @@ DBUSER="zabbix"            # ZABBIX DATABASE USER
 DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
 OSTAG="ol"                 # OS BASE IMAGE TAG
 
-TIMEZ="Europe/Riga"        # CHANGE TO YOUR LOCAL TIMEZONE IN PHP FORMAT
 
 # VARIABLES SET
 ZBXVER="${ZBXMAJORVER}.${ZBXMINORVER}"
@@ -20,6 +19,8 @@ ZBXSERVERNAME="zabbix${ZBXMAJORVER}${ZBXMINORVER}"
 PODNAME="${ZBXSERVERNAME}pod"
 ZBXTAG="${OSTAG}-${ZBXVER}-latest"
 DBTAG="lts"
+SELENIUMTAG="latest"
+TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMAT
 
 
 # VOLUME DIRECTORIES SET
@@ -45,7 +46,9 @@ podman pod create \
     -v "$HOME/$PODNAME"/server/externalscripts:/usr/lib/zabbix/externalscripts:z \
     -v "$HOME/$PODNAME"/server/snmptraps:/var/lib/zabbix/snmptraps:z
 
-# CONTAINER SET
+## CONTAINER SET ##
+
+# ZABBIX SERVER CONTAINER
 podman run \
     --name $ZBXSERVERNAME-mysql \
     --stop-signal SIGHUP \
@@ -80,6 +83,8 @@ podman run \
     -e ZBX_ENABLE_SNMP_TRAPS=true \
     -e ZBX_STARTREPORTWRITERS=1 \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
+    -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
+    -e ZBX_STARTBROWSERPOLLERS=4 \
     -d zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
@@ -137,3 +142,15 @@ podman run \
     -e ZBX_PASSIVE_ALLOW="true" \
     -e ZBX_ACTIVE_ALLOW="true" \
     -d zabbix/zabbix-agent2:"$ZBXTAG"
+
+# SELENIUM GRID STANDALONE WITH CHROME - For browser item
+podman run \
+    --name $ZBXSERVERNAME-selenium \
+    --stop-signal SIGHUP \
+    --pod "$PODNAME" \
+    --tz=local \
+    --restart=unless-stopped \
+    --init \
+    --shm-size-systemd=0 \
+    -e TZ="$TIMEZ" \
+    -d selenium/standalone-chrome:"$SELENIUMTAG"

@@ -5,7 +5,7 @@
 
 Nowadays there are several reasons to use containers and some tools are available to manage them. [Podman](https://podman.io/) is such a tool, and besides Docker, it uses the [concept of Pods](https://kubernetes.io/docs/concepts/workloads/pods/), commonly used in Kubernetes.
 
-Zabbix SIA provides Docker images for each Zabbix component to run as a portable and self-sufficient container. Also, Docker Compose files are also available to define and run multi-container Zabbix components in Docker. Since Podman can use Docker images, it is easy to port them to a Pod context. One can even use the Docker compose file to launch Zabbix containers. However, out-of-the-box Podman is not ready to run the Docker compose files.
+Zabbix SIA provides Docker images for each Zabbix component to run as a portable and self-sufficient container. Also, [Docker Compose files](https://www.zabbix.com/documentation/current/en/manual/installation/containers) are available to define and run multi-container Zabbix components in Docker. Since Podman can use Docker images, it is easy to port them to a Pod context. One [can even use the compose file](https://github.com/containers/podman-compose) to launch Zabbix containers. However, out-of-the-box Podman is not ready to run the compose files.
 
 There are multiple Zabbix components that are constantly communicating with each other. When deploying Zabbix components as containers, they must be tightly coupled and may need to share resources. With the Pod concept, these containers can form a single cohesive unit. So, to let Zabbix benefit from Podman's improvements, here's a simplified Pod proposal for Zabbix components in a Shell script format.
 
@@ -31,17 +31,19 @@ There are other differences between Podman and Docker, but this proposal is main
 <BR>
 
 ---
+
 ### ➡️ [Script Download](./zabbixpod.sh)
+
 ---
 
 <BR>
 
-## Setup
+## Quick Setup
 
 1. Copy the script to your environment
 2. Make the script executable
     - `chmod +x zabbixpod.sh`
-3. With Podman running, start the script
+3. With Podman installed, start the script
     - `./zabbixpod.sh`
 4. Access the Zabbix Frontend
     - `http://host.ip:8080`
@@ -62,8 +64,6 @@ There are other differences between Podman and Docker, but this proposal is main
 > DBUSER="zabbix"            # ZABBIX DATABASE USER
 > DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
 > OSTAG="ol"                 # OS BASE IMAGE TAG
->
-> TIMEZ="Europe/Riga"        # CHANGE TO YOUR LOCAL TIMEZONE IN PHP FORMAT
 > ```
 
 <BR>
@@ -99,6 +99,7 @@ zabbixpod/
 - `Zabbix SNMPTraps`
 - `Zabbix Web Service`
 - `Zabbix Agent 2`
+- `Selenium Grid Standalone Chrome`
 
 **6.** The **first time** the Pod is launched, it may take **about 2 minutes to be able to access the Zabbix Frontend** while the database is being created.
 
@@ -147,19 +148,22 @@ POD ID        NAME         STATUS      CREATED        INFRA ID      # OF CONTAIN
 b399fe5e8f50  zabbix70pod  Running     9 minutes ago  a41c40bfb700  7
 
 [user@host ~]$ podman ps -ap
-CONTAINER ID  IMAGE                                                  COMMAND               CREATED        STATUS        PORTS                                                                    NAMES                     POD ID        PODNAME
-5de8e984bdf5  localhost/podman-pause:4.9.4-rhel-1718143542                                 4 seconds ago  Up 5 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70pod-infra         436244a5c239  zabbix70pod
-c6730b91fcdb  docker.io/library/mysql:lts                            --character-set-s...  4 seconds ago  Up 4 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-mysql            436244a5c239  zabbix70pod
-e50937e52cd3  docker.io/zabbix/zabbix-server-mysql:ol-7.0-latest     /usr/sbin/zabbix_...  4 seconds ago  Up 4 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-server           436244a5c239  zabbix70pod
-99d5d574e4da  docker.io/zabbix/zabbix-web-nginx-mysql:ol-7.0-latest                        3 seconds ago  Up 4 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-nginx-mysql  436244a5c239  zabbix70pod
-21e08aef7a62  docker.io/zabbix/zabbix-snmptraps:ol-7.0-latest        /usr/sbin/snmptra...  3 seconds ago  Up 4 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-snmptraps        436244a5c239  zabbix70pod
-64cf27687675  docker.io/zabbix/zabbix-web-service:ol-7.0-latest      /usr/sbin/zabbix_...  3 seconds ago  Up 3 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-service      436244a5c239  zabbix70pod
-517a0b914587  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/zabbix_...  3 seconds ago  Up 3 seconds  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-agent2           436244a5c239  zabbix70pod
+CONTAINER ID  IMAGE                                                  COMMAND               CREATED         STATUS             PORTS                                                                    NAMES                     POD ID        PODNAME
+b2d293f6a066  localhost/podman-pause:4.9.4-rhel-1721808536                                 23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70pod-infra         03acfc6d9deb  zabbix70pod
+b685b713ed1f  docker.io/library/mysql:lts                            --character-set-s...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-mysql            03acfc6d9deb  zabbix70pod
+3748f01949df  docker.io/zabbix/zabbix-server-mysql:ol-7.0-latest     /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-server           03acfc6d9deb  zabbix70pod
+2dede500ffff  docker.io/zabbix/zabbix-web-nginx-mysql:ol-7.0-latest                        23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-nginx-mysql  03acfc6d9deb  zabbix70pod
+6cfb392e0f8b  docker.io/zabbix/zabbix-snmptraps:ol-7.0-latest        /usr/sbin/snmptra...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-snmptraps        03acfc6d9deb  zabbix70pod
+7d3890840e11  docker.io/zabbix/zabbix-web-service:ol-7.0-latest      /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-service      03acfc6d9deb  zabbix70pod
+e06ae3c46905  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-agent2           03acfc6d9deb  zabbix70pod
+1a20f14f140c  docker.io/selenium/standalone-chrome:latest            /opt/bin/entry_po...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-selenium         03acfc6d9deb  zabbix70pod
 ```
 
-> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored this user's home directory.**_
+> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory.**_
 
 The Zabbix Frontend should be accessible at `http://host.ip:8080`. The default user and password are `Admin` and `zabbix` respectively.
+
+You can also create multiple pods for different versions of Zabbix on the same system. Note, however, that each pod should use a different set of exposed ports. These should be configured in the script variable set.
 
 <BR>
 
