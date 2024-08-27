@@ -27,6 +27,7 @@ There are other differences between Podman and Docker, but this proposal is main
 - 🛠️ [Install Podman](https://podman.io/docs/installation)
 - 🛠️ [Basic setup](https://github.com/containers/podman/blob/main/docs/tutorials/podman_tutorial.md)
 - 🛠️ [Rootless environment](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md)
+- 🛠️ [SystemD TimedateD](https://www.freedesktop.org/wiki/Software/systemd/timedated/) - _for timezone reading_
 
 <BR>
 
