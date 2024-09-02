@@ -23,7 +23,7 @@ ZBXTAG="${OSTAG}-${ZBXVER}-latest"
 TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMAT
 DBTAG="lts"
 SELENIUMTAG="latest"
-
+AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
 
 
 # VOLUME DIRECTORIES SET
@@ -51,28 +51,28 @@ podman pod create \
 
 ## CONTAINER SET ##
 
-# ZABBIX SERVER CONTAINER
-podman run \
+# ZABBIX DBMS CONTAINER
+podman create \
     --name $ZBXSERVERNAME-mysql \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
-    --restart=unless-stopped \
     --init \
     --tz=local \
+    --label "$AUTOUPDATEREG" \
     -e MYSQL_ROOT_PASSWORD="$DBROOTPASS" \
-    -d mysql:"$DBTAG" \
+    mysql:"$DBTAG" \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_bin
 
 # ZABBIX SERVER CONTAINER
-podman run \
+podman create \
     --name $ZBXSERVERNAME-server \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
-    --restart=unless-stopped \
     --init \
     --cap-add=net_raw \
     --tz=local \
+    --label "$AUTOUPDATEREG" \
     -e DB_SERVER_HOST="$ZBXSERVERNAME-mysql" \
     -e DB_SERVER_PORT="3306" \
     -e MYSQL_ROOT_PASSWORD="$DBROOTPASS" \
@@ -88,16 +88,16 @@ podman run \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
     -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
     -e ZBX_STARTBROWSERPOLLERS=4 \
-    -d zabbix/zabbix-server-mysql:"$ZBXTAG"
+    zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
-podman run \
+podman create \
     --name $ZBXSERVERNAME-web-nginx-mysql \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
     --tz=local \
-    --restart=unless-stopped \
     --init \
+    --label "$AUTOUPDATEREG" \
     -e DB_SERVER_HOST="$ZBXSERVERNAME-mysql" \
     -e DB_SERVER_PORT="3306" \
     -e MYSQL_DATABASE="$DBNAME" \
@@ -107,53 +107,71 @@ podman run \
     -e ZBX_SERVER_NAME="${ZBXSERVERNAME}_Pod" \
     -e PHP_TZ="$TIMEZ" \
     -e EXPOSE_WEB_SERVER_INFO="on" \
-    -d zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
+    zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
-podman run \
+podman create \
     --name $ZBXSERVERNAME-snmptraps \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
     --tz=local \
-    --restart=unless-stopped \
     --init \
-    -d zabbix/zabbix-snmptraps:"$ZBXTAG"
+    --label "$AUTOUPDATEREG" \
+    zabbix/zabbix-snmptraps:"$ZBXTAG"
 
 # ZABBIX WEB SERVICE CONTAINER
-podman run \
+podman create \
     --name $ZBXSERVERNAME-web-service \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
     --tz=local \
-    --restart=unless-stopped \
     --init \
     --cap-add=SYS_ADMIN \
+    --label "$AUTOUPDATEREG" \
     -e ZBX_ALLOWEDIP="$ZBXSERVERNAME-server" \
-    -d zabbix/zabbix-web-service:"$ZBXTAG"
+    zabbix/zabbix-web-service:"$ZBXTAG"
 
 # ZABBIX AGENT 2 CONTAINER
-podman run \
+podman create \
     --name $ZBXSERVERNAME-agent2 \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
     --tz=local \
     --privileged \
-    --restart=unless-stopped \
     --init \
+    --label "$AUTOUPDATEREG" \
     -e ZBX_HOSTNAME="$ZBXSERVERNAME-server" \
     -e ZBX_SERVER_HOST="$ZBXSERVERNAME-server" \
     -e ZBX_PASSIVE_ALLOW="true" \
     -e ZBX_ACTIVE_ALLOW="true" \
-    -d zabbix/zabbix-agent2:"$ZBXTAG"
+    zabbix/zabbix-agent2:"$ZBXTAG"
 
 # SELENIUM GRID STANDALONE WITH CHROME - For browser item
-podman run \
+podman create \
     --name $ZBXSERVERNAME-selenium \
     --stop-signal SIGHUP \
     --pod "$PODNAME" \
     --tz=local \
-    --restart=unless-stopped \
     --init \
     --shm-size-systemd=0 \
+    --label "$AUTOUPDATEREG" \
     -e TZ="$TIMEZ" \
-    -d selenium/standalone-chrome:"$SELENIUMTAG"
+    selenium/standalone-chrome:"$SELENIUMTAG"
+
+
+## SYSTEMD SET ##
+
+SERVDIR="$HOME/.config/systemd/user"
+
+# CHECK FOR THE DEFAULT SYSTEMD SERVICE USER DIRECTORY
+[ -d "$SERVDIR" ] || mkdir -v -p "$SERVDIR"
+
+# GENERATE THE POD SYSTEMD SERVICES
+cd "$SERVDIR"
+podman generate systemd -f --name "$PODNAME"
+cd ~
+systemctl --user daemon-reload
+systemctl --user enable "pod-$PODNAME.service"
+systemctl --user start "pod-$PODNAME.service"
+
+printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):$PORTWEB\n\n"
