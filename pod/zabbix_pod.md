@@ -53,19 +53,22 @@ There are other differences between Podman and Docker, but this proposal is main
 
 ## The Script
 
-⚠️
-**The script has a number of variables to set up the Zabbix Pod environment. They can all be changed to suit your needs. However, it is recommended that you only change the first set of variables to avoid errors.**
+⚠️ **The script has a number of variables to set up the Zabbix Pod environment. They can all be changed to suit your needs. However, it is recommended that you only change the first set of variables to avoid errors.**
 
-> ```shell
-> # CHANGE HERE IF REQUIRED
-> ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
-> ZBXMINORVER="0"            # ZABBIX MINOR VERSION
-> DBROOTPASS="zabbix"        # DBMS ROOT PASSWORD
-> DBNAME="zabbix"            # ZABBIX DATABASE PASSWORD
-> DBUSER="zabbix"            # ZABBIX DATABASE USER
-> DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
-> OSTAG="ol"                 # OS BASE IMAGE TAG
-> ```
+```shell
+# CHANGE VARIABLES HERE IF REQUIRED
+ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
+ZBXMINORVER="0"            # ZABBIX MINOR VERSION
+DBROOTPASS="zabbix"        # DBMS ROOT PASSWORD
+DBNAME="zabbix"            # ZABBIX DATABASE PASSWORD
+DBUSER="zabbix"            # ZABBIX DATABASE USER
+DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
+PORTWEB="8080"             # ZABBIX FRONTEND WEB PORT
+PORTSNMP="1162"            # SNMP TRAP PORT
+OSTAG="ol"                 # OS BASE IMAGE TAG
+```
+
+> It is possible to start multiple instances if using different ports for each Pod.
 
 <BR>
 
@@ -103,6 +106,10 @@ zabbixpod/
 - `Selenium Grid Standalone Chrome`
 
 **6.** The **first time** the Pod is launched, it may take **about 2 minutes to be able to access the Zabbix Frontend** while the database is being created.
+
+**7.** SystemD is configured to control the Pod as a service, and the `systemctl --user` command can be used to start and stop the service.
+
+> ⚠️ When the rootless user logs out of their session, any running containers are stopped. It is best to enable user lingering for your particular user so that the Pod can run automatically. If required, run the following command **as root**: `sudo loginctl enable-linger [user]`.
 
 <BR>
 
@@ -144,20 +151,47 @@ e50937e52cd3b17b0625c5d787cb950fadd271e5779f5fb3b7a66ac9152a0363
 To confirm the Pod execution, just list it (`podman pod list`) and its containers (`podman ps -ap`).
 
 ```
-[user@host ~]$ podman pod list
-POD ID        NAME         STATUS      CREATED        INFRA ID      # OF CONTAINERS
-b399fe5e8f50  zabbix70pod  Running     9 minutes ago  a41c40bfb700  7
+[user@pods ~]$ ./zabbixpod70.sh 
+577719cbbaf4e70804751b6e37633c5fcd0e11af3d46f0beba122f8deda1c3a5
+5deb71310c4997ed0d0be498bfe55153fcce75dc82b9de93f1ef09d08924555d
+815fb0b068ce70b9094ef4f79a204d18c30371deaa0504d85fe2264305395e3e
+3c330dd51a455283fec18f735ad335ab957626210d938eea70ff8053e1d9870c
+e3ce0dc04c355e8598696149c3cb2ec913d6b00c7544657c8dc65e6db1e1e36c
+114790303cfe1d1d0d1b43200b98373049d8679288c3e01c122657db5b8216c1
+cc17ba20432416cc3e61ff44852bdfc9a91fa5753d0125d96ab501853a91f788
+cef75dcb93117b13fcdc76b65dd5a98f378960164133e652058b8c98fe98fcba
 
-[user@host ~]$ podman ps -ap
-CONTAINER ID  IMAGE                                                  COMMAND               CREATED         STATUS             PORTS                                                                    NAMES                     POD ID        PODNAME
-b2d293f6a066  localhost/podman-pause:4.9.4-rhel-1721808536                                 23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70pod-infra         03acfc6d9deb  zabbix70pod
-b685b713ed1f  docker.io/library/mysql:lts                            --character-set-s...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-mysql            03acfc6d9deb  zabbix70pod
-3748f01949df  docker.io/zabbix/zabbix-server-mysql:ol-7.0-latest     /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-server           03acfc6d9deb  zabbix70pod
-2dede500ffff  docker.io/zabbix/zabbix-web-nginx-mysql:ol-7.0-latest                        23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-nginx-mysql  03acfc6d9deb  zabbix70pod
-6cfb392e0f8b  docker.io/zabbix/zabbix-snmptraps:ol-7.0-latest        /usr/sbin/snmptra...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-snmptraps        03acfc6d9deb  zabbix70pod
-7d3890840e11  docker.io/zabbix/zabbix-web-service:ol-7.0-latest      /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-service      03acfc6d9deb  zabbix70pod
-e06ae3c46905  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/zabbix_...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-agent2           03acfc6d9deb  zabbix70pod
-1a20f14f140c  docker.io/selenium/standalone-chrome:latest            /opt/bin/entry_po...  23 minutes ago  Up About a minute  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-selenium         03acfc6d9deb  zabbix70pod
+mkdir: created directory '/home/user/.config/systemd'
+mkdir: created directory '/home/user/.config/systemd/user'
+
+/home/user/.config/systemd/user/container-zabbix70-mysql.service
+/home/user/.config/systemd/user/container-zabbix70-server.service
+/home/user/.config/systemd/user/pod-zabbix70pod.service
+/home/user/.config/systemd/user/container-zabbix70-web-nginx-mysql.service
+/home/user/.config/systemd/user/container-zabbix70-snmptraps.service
+/home/user/.config/systemd/user/container-zabbix70-web-service.service
+/home/user/.config/systemd/user/container-zabbix70-agent2.service
+/home/user/.config/systemd/user/container-zabbix70-selenium.service
+
+Created symlink /home/user/.config/systemd/user/default.target.wants/pod-zabbix70pod.service → /home/user/.config/systemd/user/pod-zabbix70pod.service.
+
+● pod-zabbix70pod.service - Podman pod-zabbix70pod.service
+     Loaded: loaded (/home/user/.config/systemd/user/pod-zabbix70pod.service; enabled; preset: disabled)
+     Active: active (running) since Mon 2024-09-02 00:23:49 -03; 49ms ago
+       Docs: man:podman-generate-systemd(1)
+    Process: 15313 ExecStart=/usr/bin/podman start zabbix70pod-infra (code=exited, status=0/SUCCESS)
+   Main PID: 15341 (conmon)
+      Tasks: 15 (limit: 190758)
+     Memory: 6.4M
+        CPU: 52ms
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/pod-zabbix70pod.service
+             ├─15324 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable-seccomp --enable-ipv6 -c -r 3 -e 4 --netns-type=path /run/user/1000/netns>
+             ├─15325 /usr/bin/fuse-overlayfs -o lowerdir=/home/user/.local/share/containers/storage/overlay/l/QQLZ5V6BC4UP4YOCZCQT6LM5DY,upperdir=/home/user/.local/share/container>
+             ├─15328 rootlessport
+             ├─15333 rootlessport-child
+             └─15341 /usr/bin/conmon --api-version 1 -c cc6955806f559ebe67ad7a6ec23713317f349868a0bea0f08783bcbffdfb5c2e -u cc6955806f559ebe67ad7a6ec23713317f349868a0bea0f08783b>
+
+Zabbix Pod started at http://192.168.7.102:8080
 ```
 
 > _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory.**_
