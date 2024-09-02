@@ -68,8 +68,6 @@ PORTSNMP="1162"            # SNMP TRAP PORT
 OSTAG="ol"                 # OS BASE IMAGE TAG
 ```
 
-> It is possible to start multiple instances if using different ports for each Pod.
-
 <BR>
 
 **1.** The script first creates a Pod called `zabbix[VERSION]pod`.
@@ -138,19 +136,6 @@ For testing purposes, let's create an environment to run the Zabbix Pod.
 Run the script (`./zabbixpod.sh`), and then it will create the containers inside the Pod. If the images are not found locally, Podman will download them, just like Docker.
 
 ```
-[user@host ~]$ ./zabbixpod.sh
-436244a5c23927504da3626b4ee17122b79dc9660dc0b0f727bc52da3b682d6b
-c6730b91fcdba7fbf57a86e7a16cd33a27e9ae75959668f04bbe9a68d4b251bd
-e50937e52cd3b17b0625c5d787cb950fadd271e5779f5fb3b7a66ac9152a0363
-99d5d574e4daba6de9059fc3c158031e0ff70b247a73b7c97c02d1ae7ee54402
-21e08aef7a62a5849518bcf9c3c40a2f8c0e96ce1bdc164e0d7ca00805c03a7b
-64cf276876753ee5263ddfe7f1f7ea4543b27e2cab072213580494e5914ff5e0
-517a0b914587335e322b86b146040bceb37b6b56f719dfa03b0edb3044f1a373
-```
-
-To confirm the Pod execution, just list it (`podman pod list`) and its containers (`podman ps -ap`).
-
-```
 [user@pods ~]$ ./zabbixpod70.sh 
 577719cbbaf4e70804751b6e37633c5fcd0e11af3d46f0beba122f8deda1c3a5
 5deb71310c4997ed0d0be498bfe55153fcce75dc82b9de93f1ef09d08924555d
@@ -194,11 +179,30 @@ Created symlink /home/user/.config/systemd/user/default.target.wants/pod-zabbix7
 Zabbix Pod started at http://192.168.7.102:8080
 ```
 
-> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory.**_
+To confirm the Pod execution, just list it (`podman pod list`) and its containers (`podman ps -ap`).
+
+```
+[user@pods ~]$ podman pod list
+POD ID        NAME         STATUS      CREATED         INFRA ID      # OF CONTAINERS
+577719cbbaf4  zabbix70pod  Running     13 minutes ago  cc6955806f55  8
+
+[user@pods ~]$ podman ps -ap
+CONTAINER ID  IMAGE                                                  COMMAND               CREATED         STATUS         PORTS                                                                    NAMES                     POD ID        PODNAME
+cc6955806f55  localhost/podman-pause:4.9.4-rhel-1721808536                                 13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70pod-infra         577719cbbaf4  zabbix70pod
+5deb71310c49  docker.io/library/mysql:lts                            --character-set-s...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-mysql            577719cbbaf4  zabbix70pod
+815fb0b068ce  docker.io/zabbix/zabbix-server-mysql:ol-7.0-latest     /usr/sbin/zabbix_...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-server           577719cbbaf4  zabbix70pod
+3c330dd51a45  docker.io/zabbix/zabbix-web-nginx-mysql:ol-7.0-latest                        13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-nginx-mysql  577719cbbaf4  zabbix70pod
+e3ce0dc04c35  docker.io/zabbix/zabbix-snmptraps:ol-7.0-latest        /usr/sbin/snmptra...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-snmptraps        577719cbbaf4  zabbix70pod
+114790303cfe  docker.io/zabbix/zabbix-web-service:ol-7.0-latest      /usr/sbin/zabbix_...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-web-service      577719cbbaf4  zabbix70pod
+cc17ba204324  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/zabbix_...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-agent2           577719cbbaf4  zabbix70pod
+cef75dcb9311  docker.io/selenium/standalone-chrome:latest            /opt/bin/entry_po...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-selenium         577719cbbaf4  zabbix70pod
+```
+
+> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory with the same name as the Pod.**_
 
 The Zabbix Frontend should be accessible at `http://host.ip:8080`. The default user and password are `Admin` and `zabbix` respectively.
 
-You can also create multiple pods for different versions of Zabbix on the same system. Note, however, that each pod should use a different set of exposed ports. These should be configured in the script variable set.
+You can also create multiple pods for different versions of Zabbix on the same system. Note, however, that each pod should use a different set of binded ports. These should be configured in the script variable set.
 
 <BR>
 
