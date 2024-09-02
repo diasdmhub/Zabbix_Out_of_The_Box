@@ -3,13 +3,15 @@
 # by diasdm
 
 
-# CHANGE HERE IF REQUIRED
+# CHANGE VARIABLES HERE IF REQUIRED
 ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
 ZBXMINORVER="0"            # ZABBIX MINOR VERSION
 DBROOTPASS="zabbix"        # DBMS ROOT PASSWORD
 DBNAME="zabbix"            # ZABBIX DATABASE PASSWORD
 DBUSER="zabbix"            # ZABBIX DATABASE USER
 DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
+PORTWEB="8080"             # ZABBIX FRONTEND WEB PORT
+PORTSNMP="1162"            # SNMP TRAP PORT
 OSTAG="ol"                 # OS BASE IMAGE TAG
 
 
@@ -18,9 +20,10 @@ ZBXVER="${ZBXMAJORVER}.${ZBXMINORVER}"
 ZBXSERVERNAME="zabbix${ZBXMAJORVER}${ZBXMINORVER}"
 PODNAME="${ZBXSERVERNAME}pod"
 ZBXTAG="${OSTAG}-${ZBXVER}-latest"
+TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMAT
 DBTAG="lts"
 SELENIUMTAG="latest"
-TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMAT
+
 
 
 # VOLUME DIRECTORIES SET
@@ -36,9 +39,9 @@ TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMA
 podman pod create \
     --name "$PODNAME" \
     --infra-name "$PODNAME"-infra \
-    -p 8080:8080 \
+    -p "$PORTWEB":8080 \
+    -p "$PORTSNMP":162/udp \
     -p 10051:10051 \
-    -p 1162:162/udp \
     -v "$HOME/$PODNAME"/mysql/data:/var/lib/mysql:z \
     -v "$HOME/$PODNAME"/mysql/conf:/etc/mysql/conf.d:z \
     -v "$HOME/$PODNAME"/agent:/etc/zabbix/zabbix_agentd.d:z \
