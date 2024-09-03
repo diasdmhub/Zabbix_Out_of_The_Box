@@ -173,6 +173,6 @@ cd ~
 systemctl --user daemon-reload
 systemctl --user enable "pod-$PODNAME.service"
 systemctl --user start "pod-$PODNAME.service"
-systemctl --user --no-pager status "pod-zabbix70pod.service"
+systemctl --user --no-pager status "pod-$PODNAME.service"
 
 printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):$PORTWEB\n\n"
