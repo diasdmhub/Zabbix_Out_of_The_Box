@@ -15,6 +15,7 @@ There are other differences between Podman and Docker, but this proposal is main
 
 ## Possible benefits
 
+- ⭐ Fast deployment
 - ⭐ Rootless container environment
 - ⭐ Container isolation and shared resources within a Pod
 
@@ -27,7 +28,7 @@ There are other differences between Podman and Docker, but this proposal is main
 - 🛠️ [Install Podman](https://podman.io/docs/installation)
 - 🛠️ [Basic setup](https://github.com/containers/podman/blob/main/docs/tutorials/podman_tutorial.md)
 - 🛠️ [Rootless environment](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md)
-- 🛠️ [SystemD TimedateD](https://www.freedesktop.org/wiki/Software/systemd/timedated/) - _for timezone reading_
+- 🛠️ [SystemD TimedateD](https://www.freedesktop.org/wiki/Software/systemd/timedated/) - _for timezone reading and Pod service management_
 
 <BR>
 
@@ -72,11 +73,11 @@ OSTAG="ol"                 # OS BASE IMAGE TAG
 
 **1.** The script first creates a Pod called `zabbix[VERSION]pod`.
 
-**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed once it is created. It has some volumes associated with it for the database, Zabbix server, and agent files, which allows for some data persistence.
+**2.** Most of the attributes that make up the Pod are assigned to the `infra` container and cannot be changed once it is created. It has some volumes associated with it for the database, Zabbix server, and agent files, which allows for some data persistence. The data directory name is the same as the Pod.
 
 ```shell
-[user@host ~]$ tree zabbixpod/
-zabbixpod/
+[user@host ~]$ tree zabbix[version]pod/
+zabbix[version]pod/
 ├── agent
 ├── mysql
 │   ├── conf
@@ -94,7 +95,7 @@ zabbixpod/
 
 **4.** Following the Pod, a MySQL container is created. It is not binded to a routable network accessible from outside the Pod. Its credentials are set in the first variable set.
 
-**5.** Next, Zabbix component containers are created all binded to the `localhost` address of the Pod as a shared network name space. They are:
+**5.** Next, Zabbix component containers are created all binded to the `localhost` address of the Pod as a shared network name space. Also, a a web driver container is created for Zabbix browser items. The containers are:
 
 - `Zabbix Server`
 - `Zabbix Web Frontend`
@@ -179,7 +180,7 @@ Created symlink /home/user/.config/systemd/user/default.target.wants/pod-zabbix7
 Zabbix Pod started at http://192.168.7.102:8080
 ```
 
-To confirm the Pod execution, just list it (`podman pod list`) and its containers (`podman ps -ap`).
+To confirm the Pod execution, its service status is shown. You may also list Pods with `podman pod list` and its containers with `podman ps -ap`.
 
 ```
 [user@pods ~]$ podman pod list
@@ -198,9 +199,12 @@ cc17ba204324  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/z
 cef75dcb9311  docker.io/selenium/standalone-chrome:latest            /opt/bin/entry_po...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-selenium         577719cbbaf4  zabbix70pod
 ```
 
-> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory with the same name as the Pod.**_
+> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory.**_
 
-The Zabbix Frontend should be accessible at `http://host.ip:8080`. The default user and password are `Admin` and `zabbix` respectively.
+<BR>
+
+The Zabbix Frontend should be accessible at `http://host.ip:8080`. \
+The default user and password are `Admin` and `zabbix` respectively.
 
 You can also create multiple pods for different versions of Zabbix on the same system. Note, however, that each pod should use a different set of binded ports. These should be configured in the script variable set.
 
