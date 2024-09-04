@@ -48,7 +48,7 @@ This is a simple template that discovers multiple files in a directory. It is ba
 | {$ENTRY.MAX.DEPTH}        | 0             | **N** maximum depth of subdirectories to traverse. **-1** = unlimited, **0** = no descending into subdirectories. |
 | {$ENTRY.NAME.MATCHES}     |               | File names to be listed. All if empty |
 | {$ENTRY.NAME.NOT_MATCHES} |               | File names **NOT** to be listed |
-| {$ENTRY.TYPE.MATCHES}     | file          | Type of entry to be listed. See doc for more types |
+| {$ENTRY.TYPE.MATCHES}     | file          | Type of entry to be listed. [See doc](https://www.zabbix.com/documentation/current/en/manual/config/items/itemtypes/zabbix_agent) for more types |
 | {$ENTRY.TYPE.NOT_MATCHES} |               | Type of entry **NOT** to be listed |
 
 <BR>
