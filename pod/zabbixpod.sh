@@ -35,7 +35,9 @@ AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
     mkdir -p "$HOME/$PODNAME/server/snmptraps"
 
 
-# POD CREATION - CHANGE PORTS IF REQUIRED
+# POD CREATION
+printf "\n$PODNAME POD CREATION\n"
+
 podman pod create \
     --name "$PODNAME" \
     --infra-name "$PODNAME"-infra \
@@ -52,6 +54,8 @@ podman pod create \
 ## CONTAINER SET ##
 
 # ZABBIX DBMS CONTAINER
+printf "\n$ZBXSERVERNAME-mysql CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-mysql \
     --stop-signal SIGHUP \
@@ -60,11 +64,13 @@ podman create \
     --tz=local \
     --label "$AUTOUPDATEREG" \
     -e MYSQL_ROOT_PASSWORD="$DBROOTPASS" \
-    mysql:"$DBTAG" \
+    docker.io/library/mysql:"$DBTAG" \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_bin
 
 # ZABBIX SERVER CONTAINER
+printf "\n$ZBXSERVERNAME-server CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-server \
     --stop-signal SIGHUP \
@@ -88,9 +94,11 @@ podman create \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
     -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
     -e ZBX_STARTBROWSERPOLLERS=4 \
-    zabbix/zabbix-server-mysql:"$ZBXTAG"
+    docker.io/zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
+printf "\n$ZBXSERVERNAME-web-nginx-mysql CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-web-nginx-mysql \
     --stop-signal SIGHUP \
@@ -107,9 +115,11 @@ podman create \
     -e ZBX_SERVER_NAME="${ZBXSERVERNAME}_Pod" \
     -e PHP_TZ="$TIMEZ" \
     -e EXPOSE_WEB_SERVER_INFO="on" \
-    zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
+    docker.io/zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
+printf "\n$ZBXSERVERNAME-snmptraps CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-snmptraps \
     --stop-signal SIGHUP \
@@ -117,9 +127,11 @@ podman create \
     --tz=local \
     --init \
     --label "$AUTOUPDATEREG" \
-    zabbix/zabbix-snmptraps:"$ZBXTAG"
+    docker.io/zabbix/zabbix-snmptraps:"$ZBXTAG"
 
 # ZABBIX WEB SERVICE CONTAINER
+printf "\n$ZBXSERVERNAME-web-service CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-web-service \
     --stop-signal SIGHUP \
@@ -129,9 +141,11 @@ podman create \
     --cap-add=SYS_ADMIN \
     --label "$AUTOUPDATEREG" \
     -e ZBX_ALLOWEDIP="$ZBXSERVERNAME-server" \
-    zabbix/zabbix-web-service:"$ZBXTAG"
+    docker.io/zabbix/zabbix-web-service:"$ZBXTAG"
 
 # ZABBIX AGENT 2 CONTAINER
+printf "\n$ZBXSERVERNAME-agent2 CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-agent2 \
     --stop-signal SIGHUP \
@@ -144,9 +158,11 @@ podman create \
     -e ZBX_SERVER_HOST="$ZBXSERVERNAME-server" \
     -e ZBX_PASSIVE_ALLOW="true" \
     -e ZBX_ACTIVE_ALLOW="true" \
-    zabbix/zabbix-agent2:"$ZBXTAG"
+    docker.io/zabbix/zabbix-agent2:"$ZBXTAG"
 
 # SELENIUM GRID STANDALONE WITH CHROME - For browser item
+printf "\n$ZBXSERVERNAME-selenium CONTAINER CREATION\n"
+
 podman create \
     --name $ZBXSERVERNAME-selenium \
     --stop-signal SIGHUP \
@@ -156,23 +172,36 @@ podman create \
     --shm-size-systemd=0 \
     --label "$AUTOUPDATEREG" \
     -e TZ="$TIMEZ" \
-    selenium/standalone-chrome:"$SELENIUMTAG"
+    docker.io/selenium/standalone-chrome:"$SELENIUMTAG"
 
 
 ## SYSTEMD SET ##
+printf "\nSYSTEMD \"$PODNAME.service\" SERVICE CREATION\n"
 
 SERVDIR="$HOME/.config/systemd/user"
+
+# When logging in from another user
+if [[ -z ${XDG_RUNTIME_DIR} ]]; then
+    printf "\nXDG_RUNTIME_DIR var not set. Exporting it\n"
+    export XDG_RUNTIME_DIR="/run/user/${UID}"
+    printf '\nexport XDG_RUNTIME_DIR="/run/user/${UID}"' >> $HOME/.bashrc
+fi
+if [[ -z ${DBUS_SESSION_BUS_ADDRESS} ]]; then
+    printf "\nDBUS_SESSION_BUS_ADDRESS var not set. Exporting it\n"
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+    printf '\nexport DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"' >> $HOME/.bashrc
+fi
 
 # CHECK FOR THE DEFAULT SYSTEMD SERVICE USER DIRECTORY
 [ -d "$SERVDIR" ] || mkdir -v -p "$SERVDIR"
 
 # GENERATE THE POD SYSTEMD SERVICES
 cd "$SERVDIR"
-podman generate systemd -f --name "$PODNAME"
+podman generate systemd -f --pod-prefix "" --name "$PODNAME"
 cd ~
 systemctl --user daemon-reload
-systemctl --user enable "pod-$PODNAME.service"
-systemctl --user start "pod-$PODNAME.service"
-systemctl --user --no-pager status "pod-$PODNAME.service"
+systemctl --user enable "$PODNAME.service"
+systemctl --user start "$PODNAME.service"
+systemctl --user --no-pager status "$PODNAME.service"
 
 printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):$PORTWEB\n\n"
