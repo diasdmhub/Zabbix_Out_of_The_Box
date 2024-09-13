@@ -80,8 +80,8 @@ OSTAG="ol"                 # OS BASE IMAGE TAG
 zabbix[version]pod/
 ├── agent
 ├── mysql
-│   ├── conf
-│   └── data
+│   ├── conf
+│   └── data
 └── server
     ├── alertscripts
     ├── externalscripts
@@ -104,11 +104,11 @@ zabbix[version]pod/
 - `Zabbix Agent 2`
 - `Selenium Grid Standalone Chrome`
 
-**6.** The **first time** the Pod is launched, it may take **about 2 minutes to be able to access the Zabbix Frontend** while the database is being created.
+**6.** The **first time** the Pod is launched, it may take ⚠️ **about 2 minutes to be able to access the Zabbix Frontend** while the database is being created.
 
-**7.** SystemD is configured to control the Pod as a service, and the `systemctl --user` command can be used to start and stop the service.
+**7.** SystemD is configured to control the Pod as a service, and the **`systemctl --user`** command can be used to start and stop the service.
 
-> ⚠️ When the rootless user logs out of their session, any running containers are stopped. It is best to enable user lingering for your particular user so that the Pod can run automatically. If required, run the following command **as root**: `sudo loginctl enable-linger [user]`.
+> ⚠️ When the rootless user logs out of their session, any running containers are stopped. It is best to enable user lingering for your particular user so that the Pod can run automatically. If required, run the following command **as root**: `sudo loginctl enable-linger [pod user]`.
 
 <BR>
 
@@ -138,44 +138,61 @@ Run the script (`./zabbixpod.sh`), and then it will create the containers inside
 
 ```
 [user@pods ~]$ ./zabbixpod70.sh 
-577719cbbaf4e70804751b6e37633c5fcd0e11af3d46f0beba122f8deda1c3a5
-5deb71310c4997ed0d0be498bfe55153fcce75dc82b9de93f1ef09d08924555d
-815fb0b068ce70b9094ef4f79a204d18c30371deaa0504d85fe2264305395e3e
-3c330dd51a455283fec18f735ad335ab957626210d938eea70ff8053e1d9870c
-e3ce0dc04c355e8598696149c3cb2ec913d6b00c7544657c8dc65e6db1e1e36c
-114790303cfe1d1d0d1b43200b98373049d8679288c3e01c122657db5b8216c1
-cc17ba20432416cc3e61ff44852bdfc9a91fa5753d0125d96ab501853a91f788
-cef75dcb93117b13fcdc76b65dd5a98f378960164133e652058b8c98fe98fcba
+zabbix70pod POD CREATION
+9d2208fc0b06d5b2e5c9e69dacc9d9fc80c92df87fde30507480a9dfa46b74f8
+
+zabbix70-mysql CONTAINER CREATION
+6951f76a9e281d5dfc5b0954a3b7d585adda26820d95617c0fb09c3d0e0b6323
+
+zabbix70-server CONTAINER CREATION
+26c94c865a348c578a93d6e4f63132f5949c210cf90348bf84487f76202f0f44
+
+zabbix70-web-nginx-mysql CONTAINER CREATION
+adb221f118fff0b3ead70b046ad0f6099767ac6f4d9677b49166b3f012444760
+
+zabbix70-snmptraps CONTAINER CREATION
+6c9e0d95236e0f68509ad4624d84cf3fb8c8f25cf7541f1ab02bd38ed02096a1
+
+zabbix70-web-service CONTAINER CREATION
+c1ff29f5faddeba23378edb27a6e18b11ad40d9d80e250178c6b17eefbcfaf69
+
+zabbix70-agent2 CONTAINER CREATION
+9652eaf154776ba8fdca18678770519503be2fd4cb95069ef0341d0d196bd10f
+
+zabbix70-selenium CONTAINER CREATION
+65cc775c7e56de1ad5d28e012de98164c81b26fbe972b6185bc4ee1d588d1e16
+
+SYSTEMD "zabbix70pod.service" SERVICE CREATION
 
 mkdir: created directory '/home/user/.config/systemd'
 mkdir: created directory '/home/user/.config/systemd/user'
 
-/home/user/.config/systemd/user/container-zabbix70-mysql.service
-/home/user/.config/systemd/user/container-zabbix70-server.service
-/home/user/.config/systemd/user/pod-zabbix70pod.service
 /home/user/.config/systemd/user/container-zabbix70-web-nginx-mysql.service
 /home/user/.config/systemd/user/container-zabbix70-snmptraps.service
 /home/user/.config/systemd/user/container-zabbix70-web-service.service
 /home/user/.config/systemd/user/container-zabbix70-agent2.service
 /home/user/.config/systemd/user/container-zabbix70-selenium.service
+/home/user/.config/systemd/user/zabbix70pod.service
+/home/user/.config/systemd/user/container-zabbix70-mysql.service
+/home/user/.config/systemd/user/container-zabbix70-server.service
 
-Created symlink /home/user/.config/systemd/user/default.target.wants/pod-zabbix70pod.service → /home/user/.config/systemd/user/pod-zabbix70pod.service.
+Created symlink /home/user/.config/systemd/user/default.target.wants/zabbix70pod.service → /home/user/.config/systemd/user/zabbix70pod.service.
 
-● pod-zabbix70pod.service - Podman pod-zabbix70pod.service
-     Loaded: loaded (/home/user/.config/systemd/user/pod-zabbix70pod.service; enabled; preset: disabled)
-     Active: active (running) since Mon 2024-09-02 00:23:49 -03; 49ms ago
+● zabbix70pod.service - Podman zabbix70pod.service
+     Loaded: loaded (/home/user/.config/systemd/user/zabbix70pod.service; enabled; preset: disabled)
+     Active: active (running) since Thu 2024-09-12 20:49:38 -03; 40ms ago
        Docs: man:podman-generate-systemd(1)
-    Process: 15313 ExecStart=/usr/bin/podman start zabbix70pod-infra (code=exited, status=0/SUCCESS)
-   Main PID: 15341 (conmon)
-      Tasks: 15 (limit: 190758)
-     Memory: 6.4M
+    Process: 15198 ExecStart=/usr/bin/podman start zabbix70pod-infra (code=exited, status=0/SUCCESS)
+   Main PID: 15226 (conmon)
+      Tasks: 15 (limit: 190757)
+     Memory: 7.2M
         CPU: 52ms
-     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/pod-zabbix70pod.service
-             ├─15324 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable-seccomp --enable-ipv6 -c -r 3 -e 4 --netns-type=path /run/user/1000/netns>
-             ├─15325 /usr/bin/fuse-overlayfs -o lowerdir=/home/user/.local/share/containers/storage/overlay/l/QQLZ5V6BC4UP4YOCZCQT6LM5DY,upperdir=/home/user/.local/share/container>
-             ├─15328 rootlessport
-             ├─15333 rootlessport-child
-             └─15341 /usr/bin/conmon --api-version 1 -c cc6955806f559ebe67ad7a6ec23713317f349868a0bea0f08783bcbffdfb5c2e -u cc6955806f559ebe67ad7a6ec23713317f349868a0bea0f08783b>
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/zabbix70pod.service
+             ├─15209 /usr/bin/fuse-overlayfs -o lowerdir=/home/user/.local/share/containers/storage/over…
+             ├─15210 /usr/bin/slirp4netns --disable-host-loopback --mtu=65520 --enable-sandbox --enable…
+             ├─15212 rootlessport
+             ├─15218 rootlessport-child
+             └─15226 /usr/bin/conmon --api-version 1 -c 78e532e811dc8d6667f50e927c505ba07b3b5d49933242e…
 
 Zabbix Pod started at http://192.168.7.102:8080
 ```
