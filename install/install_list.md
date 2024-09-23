@@ -13,7 +13,7 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 
 | **Status**         | **Activity**                                     | **Remark\*** |
 | :---:              | ---                                              | :--- |
-| 📅                 | **Documentation**                                | _This repository_ |
+| 📅                 | **Documentation**                                | _A documentation repository_ |
 |                    | ✅ Document the project                          | ⚠️ **Always** |
 | <BR> | | |                                                            
 | 📅                 | **Plan the environment**                         | |
@@ -26,15 +26,15 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 | <BR> | | |
 | 📅                 | [**Zabbix installation steps**](https://www.zabbix.com/documentation/current/en/manual/installation/getting_zabbix) | |
 |                    | ✅ Deploy server(s)                              | |
-|                    | ✅ Server access                                 | `ssh user@host` |
-|                    | ✅ Management server access                      | `sudo -i` |
+|                    | ✅ Server remote access                          | `ssh user@host` |
+|                    | ✅ Server access privileges                      | `sudo -i` |
 |                    | ✅ Server update                                 | `dnf upgrade -y --refresh` |
 |                    | ✅ [Timezone configuration](https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html) | `timedatectl set-timezone [TIMEZONE]` |
 |                    | ✅ Date and time syncronization                  | `dnf install chrony` |
 |                    | ✅ Repository installation                       | |
 |                    | ✅ DBMS deployment                               | |
-|                    | ✅ [Minimum DBMS security configuration](https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/) | `mysql_secure_installation` |
-|                    | ✅ Advanced DBMS security configuration          | _ask the DBA_ |
+|                    | ✅ [Minimum DBMS security configuration](https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/) | at least `mysql_secure_installation` |
+|                    | ✅ Advanced DBMS configuration                   | _DBA_ |
 |                    | ✅ [Zabbix database creation](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) | |
 |                    | ✅ Zabbix database user creation                 | _Different user for each Zabbix component_ |
 |                    | ✅ Zabbix Server installation                    | |
