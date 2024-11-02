@@ -47,7 +47,7 @@ There are other differences between Podman and Docker, but this proposal is main
     - `chmod +x zabbixpod.sh`
 3. With Podman installed, start the script
     - `./zabbixpod.sh`
-4. Access the Zabbix Frontend
+4. Access the Zabbix Frontend at port `8080`
     - `http://host.ip:8080`
 
 <BR>
@@ -216,14 +216,14 @@ cc17ba204324  docker.io/zabbix/zabbix-agent2:ol-7.0-latest           /usr/sbin/z
 cef75dcb9311  docker.io/selenium/standalone-chrome:latest            /opt/bin/entry_po...  13 minutes ago  Up 13 minutes  0.0.0.0:8080->8080/tcp, 0.0.0.0:10051->10051/tcp, 0.0.0.0:1162->162/udp  zabbix70-selenium         577719cbbaf4  zabbix70pod
 ```
 
-> _**Note that the Pod was created under a non-privileged user (`~`) and all data is stored in the user's home directory.**_
+> _**Note that the Pod was created under a non-privileged user (`$`) and all data is stored in the user's home directory.**_
 
 <BR>
 
-The Zabbix Frontend should be accessible at `http://host.ip:8080`. \
+In this test, the Zabbix Frontend is accessible at `http://192.168.7.102:8080`. \
 The default user and password are `Admin` and `zabbix` respectively.
 
-You can also create multiple pods for different versions of Zabbix on the same system. Note, however, that each pod should use a different set of binded ports. These should be configured in the script variable set.
+\* You can also create multiple pods for different versions of Zabbix on the same host. Note, however, that each pod should use a different set of binded ports. These should be configured in the script variable set.
 
 <BR>
 
