@@ -64,7 +64,7 @@ podman create \
     --tz=local \
     --label "$AUTOUPDATEREG" \
     -e MYSQL_ROOT_PASSWORD="$DBROOTPASS" \
-    docker.io/library/mysql:"$DBTAG" \
+    mysql:"$DBTAG" \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_bin
 
@@ -94,7 +94,7 @@ podman create \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
     -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
     -e ZBX_STARTBROWSERPOLLERS=4 \
-    docker.io/zabbix/zabbix-server-mysql:"$ZBXTAG"
+    zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
 printf "\n$ZBXSERVERNAME-web-nginx-mysql CONTAINER CREATION\n"
@@ -115,7 +115,7 @@ podman create \
     -e ZBX_SERVER_NAME="${ZBXSERVERNAME}_Pod" \
     -e PHP_TZ="$TIMEZ" \
     -e EXPOSE_WEB_SERVER_INFO="on" \
-    docker.io/zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
+    zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
 printf "\n$ZBXSERVERNAME-snmptraps CONTAINER CREATION\n"
@@ -127,7 +127,7 @@ podman create \
     --tz=local \
     --init \
     --label "$AUTOUPDATEREG" \
-    docker.io/zabbix/zabbix-snmptraps:"$ZBXTAG"
+    zabbix/zabbix-snmptraps:"$ZBXTAG"
 
 # ZABBIX WEB SERVICE CONTAINER
 printf "\n$ZBXSERVERNAME-web-service CONTAINER CREATION\n"
@@ -141,7 +141,7 @@ podman create \
     --cap-add=SYS_ADMIN \
     --label "$AUTOUPDATEREG" \
     -e ZBX_ALLOWEDIP="$ZBXSERVERNAME-server" \
-    docker.io/zabbix/zabbix-web-service:"$ZBXTAG"
+    zabbix/zabbix-web-service:"$ZBXTAG"
 
 # ZABBIX AGENT 2 CONTAINER
 printf "\n$ZBXSERVERNAME-agent2 CONTAINER CREATION\n"
@@ -158,7 +158,7 @@ podman create \
     -e ZBX_SERVER_HOST="$ZBXSERVERNAME-server" \
     -e ZBX_PASSIVE_ALLOW="true" \
     -e ZBX_ACTIVE_ALLOW="true" \
-    docker.io/zabbix/zabbix-agent2:"$ZBXTAG"
+    zabbix/zabbix-agent2:"$ZBXTAG"
 
 # SELENIUM GRID STANDALONE WITH CHROME - For browser item
 printf "\n$ZBXSERVERNAME-selenium CONTAINER CREATION\n"
@@ -172,7 +172,13 @@ podman create \
     --shm-size-systemd=0 \
     --label "$AUTOUPDATEREG" \
     -e TZ="$TIMEZ" \
-    docker.io/selenium/standalone-chrome:"$SELENIUMTAG"
+    -e SE_START_VNC=false \
+    -e SE_ENABLE_TRACING=false \
+    -e SE_ENABLE_BROWSER_LEFTOVERS_CLEANUP=true \
+    -e SE_BROWSER_LEFTOVERS_INTERVAL_SECS=7200 \
+    -e SE_BROWSER_LEFTOVERS_PROCESSES_SECS=3600 \
+    -e SE_BROWSER_LEFTOVERS_TEMPFILES_DAYS=2 \
+    selenium/standalone-chrome:"$SELENIUMTAG"
 
 
 ## SYSTEMD SET ##
