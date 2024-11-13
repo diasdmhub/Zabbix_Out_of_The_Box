@@ -13,7 +13,7 @@
 
 ## OVERVIEW
 
-This is a simple template that checks the deleted records by the Housekeeper process.
+This is a simple template that checks the records deleted by the Housekeeper process.
 
 <BR>
 
@@ -34,7 +34,7 @@ This is a simple template that checks the deleted records by the Housekeeper pro
 ## MACROS USED
 
 | Macro                    | Default Value | Description |
-| ------------------------ | :-----------: | ----------- |
+| :----------------------- | :-----------: | :---------- |
 | {$HOUSEKEEPER.EXEC.WARN} | 60            | Time limit in seconds for Housekeeper execution time warning |
 
 <BR>
@@ -42,7 +42,7 @@ This is a simple template that checks the deleted records by the Housekeeper pro
 ## ITEMS
 
 | Name |
-| ---- |
+| :--- |
 | Housekeeper Log Statistics |
 | Housekeeper Log Statistics: Alarm Records Deleted |
 | Housekeeper Log Statistics: Audit Records Deleted |
@@ -60,7 +60,7 @@ This is a simple template that checks the deleted records by the Housekeeper pro
 ## TRIGGERS
 
 | Name |
-| ---- |
+| :--- |
 | Housekeeper execution time is High |
 
 <BR>
