@@ -1,0 +1,721 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 39cc630e39f241deacd1579c72aa882f
+      template: 'Zabbix Server Housekeeper Stats'
+      name: 'Zabbix Server Housekeeper Stats'
+      description: 'Zabbix Server Housekeeper statistics'
+      vendor:
+        name: diasdm
+        version: 7.0-5
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: 6afdec0122f844d79549d8995399b73e
+          name: 'Housekeeper Log Statistics'
+          type: ZABBIX_ACTIVE
+          key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          delay: 10m
+          history: 1d
+          value_type: LOG
+          trends: '0'
+          description: 'Master item that collects housekeeper log messages'
+          logtimefmt: 'pppppp:yyyyMMdd:hhmmss'
+          tags:
+            - tag: Log
+              value: Housekeeper
+        - uuid: 687ca83601274c9283136cd23c1c3563
+          name: 'Alarm Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[alarms]'
+          delay: '0'
+          history: 30d
+          description: 'Number of alarm records deleted on the last run of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) alarms,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Alarms
+        - uuid: d61326af25fb4ed7b44c29dd575d591d
+          name: 'Audit Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[audit]'
+          delay: '0'
+          history: 30d
+          description: 'Number of audit records deleted on the last run of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) audit,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Audit
+        - uuid: 07f8766567cc49e7936fdbeaf5d64cf6
+          name: 'Autoregistration Host Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[autoreg_host]'
+          delay: '0'
+          history: 30d
+          description: 'Number of autoregistration host records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) autoreg_host,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Autoreg_host
+        - uuid: aa0693fbb2e546beb0e48d50e5e182f0
+          name: 'Event Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[events]'
+          delay: '0'
+          history: 30d
+          description: 'Number of event records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) events,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Events
+        - uuid: c812f043a9e54e58824b8cb3dc60ba9f
+          name: 'History and Trend Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[history]'
+          delay: '0'
+          history: 30d
+          description: 'Number of history and trend records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) hist/trends,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: History
+            - tag: Housekeeper
+              value: Trends
+        - uuid: 64dc9eb5f6f041258df975e1dd250166
+          name: 'Item and Trigger Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[items]'
+          delay: '0'
+          history: 30d
+          description: 'Number of item and trigger records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) items/triggers,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Items
+            - tag: Housekeeper
+              value: Triggers
+        - uuid: fa667d99798347429d0cb9d263d9c5d6
+          name: 'Problem Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[problems]'
+          delay: '0'
+          history: 30d
+          description: 'Number of problem records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) problems,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Problems
+        - uuid: df5b53ec968c49b5b3e80ff173b78e3c
+          name: 'Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[records]'
+          delay: '0'
+          history: 30d
+          description: 'Number of records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) records in'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Records
+        - uuid: 8efd26c10a8f41d7b3e1a2b14f5de4fd
+          name: 'Session Records Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[sessions]'
+          delay: '0'
+          history: 30d
+          description: 'Number of session records deleted on the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) sessions,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Sessions
+        - uuid: d3b5d96d538c45bd813f01ed9297ed81
+          name: 'Execution Time'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.exec[time]'
+          delay: '0'
+          history: 30d
+          value_type: FLOAT
+          units: s
+          description: 'Execution time of the last execution of the Zabbix Housekeeper process'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'in (\d+.\d+) sec,'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: Time
+          triggers:
+            - uuid: 8042276c7b764d5e9d68ba4e53b68146
+              expression: 'last(/Zabbix Server Housekeeper Stats/zabbix.housekeeper.exec[time])>{$HOUSEKEEPER.EXEC.WARN}'
+              name: 'Housekeeper execution time is High'
+              opdata: 'Execution Time: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Zabbix Housekeeper execution time is higher than the configured warning limit'
+              tags:
+                - tag: Time
+                  value: high
+      tags:
+        - tag: Zabbix
+          value: housekeeper
+      macros:
+        - macro: '{$HOUSEKEEPER.EXEC.WARN}'
+          value: '60'
+          description: 'Time limit in seconds for Housekeeper execution time warning'
+      dashboards:
+        - uuid: 219cd407f56f4ec996280f20dc0c0475
+          name: 'Housekeeper Stats'
+          pages:
+            - widgets:
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[history]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
+                - type: svggraph
+                  name: 'Housekeeper Records Deleted'
+                  'y': '2'
+                  width: '36'
+                  height: '7'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: FF465C
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '* Records Deleted'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: or.0.color
+                      value: 26A69A
+                    - type: STRING
+                      name: or.0.items.0
+                      value: 'History and Trend Records Deleted'
+                    - type: STRING
+                      name: or.0.items.1
+                      value: 'Item and Trigger Records Deleted'
+                    - type: STRING
+                      name: or.1.color
+                      value: A1887F
+                    - type: STRING
+                      name: or.1.items.0
+                      value: 'Audit Records Deleted'
+                    - type: STRING
+                      name: or.1.items.1
+                      value: 'Event Records Deleted'
+                    - type: STRING
+                      name: or.1.items.2
+                      value: 'Session Records Deleted'
+                    - type: STRING
+                      name: or.1.items.3
+                      value: 'Alarm Records Deleted'
+                    - type: STRING
+                      name: or.1.items.4
+                      value: 'Autoregistration Host Records Deleted'
+                    - type: STRING
+                      name: or.1.items.5
+                      value: 'Problem Records Deleted'
+                    - type: STRING
+                      name: reference
+                      value: HFAVX
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  x: '12'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[items]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  x: '24'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[events]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  x: '36'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[problems]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
+                - type: svggraph
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '7'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 689F38
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Execution Time'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '3'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1d
+                    - type: STRING
+                      name: ds.1.color
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Daily Average'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Execution Time'
+                    - type: STRING
+                      name: ds.1.timeshift
+                      value: '-1377m'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_aggregation
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: UWBUD
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  x: '48'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[alarms]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
+                - type: item
+                  name: 'History and Trend Records Deleted'
+                  x: '60'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4E342E
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: BCAAA4
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: 81C784
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Zabbix Server Housekeeper Stats'
+                        key: 'zabbix.housekeeper.del[audit]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: up_color
+                      value: E57373
+                    - type: STRING
+                      name: value_color
+                      value: D7CCC8
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
