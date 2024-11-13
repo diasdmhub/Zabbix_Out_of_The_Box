@@ -19,7 +19,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
           delay: 10m
-          history: 1d
+          history: '0'
           value_type: LOG
           trends: '0'
           description: 'Master item that collects housekeeper log messages'
@@ -530,6 +530,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: svggraph
+                  name: 'Housekeeper Execution Time'
                   x: '36'
                   'y': '2'
                   width: '36'
