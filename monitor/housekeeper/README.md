@@ -65,6 +65,14 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 
 <BR>
 
+## DASHBOARD
+
+| Name |
+| :--- |
+| Housekeeper Stats |
+
+<BR>
+
 ## DASHBOARD EXAMPLE
 
 ![Zabbix Housekeeper Dashboard](./image/dashboard_sample.png)
