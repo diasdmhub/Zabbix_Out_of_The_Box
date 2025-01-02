@@ -39,8 +39,8 @@ For more information, see [WTTR Help](https://wttr.in/:help) and [WTTR GitHub's]
 
 | Macro              | Default Value | Description |
 | :----------------- | :-----------: | :---------- |
-| `{$WTTR_LANGUAGE}` | en            | Available languages: [](https://wttr.in/:translation) |
-| `{$WTTR_LOCATION}` |               | Place your location here. If empty, IP will be used to track the location. Multiple locations may be separated by comma. [`Latitude`,`Longitude`] supported. |
+| `{$WTTR_LANGUAGE}` | en            | [Available languages](https://wttr.in/:translation) |
+| `{$WTTR_LOCATION}` |               | Place your location here. If empty, IP will be used to track the location. Multiple locations may be separated by comma. "[`Latitude`,`Longitude`]" supported. |
 | `{$WTTR_UNIT}`     | m             | Unit types: `m`=metric (default), `u`=USCS, `M`=metric with m/s |
 
 <BR>
@@ -78,5 +78,5 @@ For more information, see [WTTR Help](https://wttr.in/:help) and [WTTR GitHub's]
 
 <BR>
 
-| [⬆️ Top](#zabbix-wttr-template) |
+| [⬆️ Top](#zabbix-wttrin-template) |
 | --- |
