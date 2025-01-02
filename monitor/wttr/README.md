@@ -5,7 +5,7 @@
 
 <div align="right">
 
-[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-721-blue?logo=zotero&color=0aa8d2)](./zabbix_housekeeper_template_v705.yaml)
+[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-721-blue?logo=zotero&color=0aa8d2)](./wttr_http_template_v721.yaml)
 
 </div>
 
