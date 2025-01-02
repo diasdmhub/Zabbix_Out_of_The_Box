@@ -1,0 +1,291 @@
+zabbix_export:
+  version: '7.2'
+  template_groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: 52ecb339a0cb4b56a19c608a094c2b86
+      template: 'WTTR by HTTP'
+      name: 'WTTR by HTTP'
+      description: |
+        WTTR.in is a "console-oriented weather forecast service that supports various information representation methods". This is a Zabbix template that pulls weather information from WTTR.in for specific locations.
+        
+        The data is retrieved in JSON format and stored in various items.
+        
+        For a quick help, see WTTR Help: https://wttr.in/:help
+        WTTR GitHub: https://github.com/chubin/wttr.in
+        
+        It is suggested to create a host for each location and set the host interface as the WTTR DNS address, something like "wttr.in".
+        
+        By diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/tree/main/monitor/wttr
+      vendor:
+        name: diasdm
+        version: 7.2-1
+      groups:
+        - name: Templates/Modules
+      items:
+        - uuid: 45e69963594646d093fe279c4698100d
+          name: Humidity
+          type: DEPENDENT
+          key: wttr.humidity
+          history: 30d
+          trends: 730d
+          units: '%'
+          description: 'WTTR humidity estimates for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].humidity'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: humidity
+        - uuid: f347dbe820ee48d4bcd085d9107447b8
+          name: 'WTTR JSON'
+          type: HTTP_AGENT
+          key: wttr.json
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          description: 'WTTR raw JSON data for the provided location'
+          timeout: 10s
+          url: 'https://wttr.in/{$WTTR_LOCATION}'
+          query_fields:
+            - name: format
+              value: j1
+          tags:
+            - tag: Wttr
+              value: json
+        - uuid: b479140f883d41a48b655d4c04ea5072
+          name: '{$WTTR_LOCATION} Latitude'
+          type: DEPENDENT
+          key: wttr.latitude
+          history: 7d
+          value_type: FLOAT
+          trends: '0'
+          description: 'The nearest latitude for the provided location, {$WTTR_LOCATION}'
+          inventory_link: LOCATION_LAT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.nearest_area[0].latitude'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: latitude
+        - uuid: 7fe07e7be547478d96840916a3e71325
+          name: '{$WTTR_LOCATION} Longitude'
+          type: DEPENDENT
+          key: wttr.longitude
+          history: 7d
+          value_type: FLOAT
+          trends: '0'
+          description: 'The nearest longitude for the provided location, {$WTTR_LOCATION}'
+          inventory_link: LOCATION_LON
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.nearest_area[0].longitude'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: longitude
+        - uuid: 804031e42e8f456199896aab44b20202
+          name: 'Temperature Average Celsius'
+          type: DEPENDENT
+          key: wttr.temp.avgcelsius
+          history: 30d
+          trends: 730d
+          units: ºC
+          description: 'WTTR average temperature in Celsius for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.weather[0].avgtempC'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 52e039913fc94f0cb83cb32e2a488756
+          name: 'Temperature Average Fahrenheit'
+          type: DEPENDENT
+          key: wttr.temp.avgfahrenheit
+          history: 30d
+          trends: 730d
+          units: ºF
+          description: 'WTTR average temperature in Fahrenheit for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.weather[0].avgtempF'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 52f12fab34314af6a6af645fcfbba043
+          name: 'Temperature Celsius'
+          type: DEPENDENT
+          key: wttr.temp.celsius
+          history: 30d
+          trends: 730d
+          units: ºC
+          description: 'WTTR temperature in Celsius for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].temp_C'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 21d1ee5caa45454c8f1d69ab5e89459c
+          name: 'Temperature Fahrenheit'
+          type: DEPENDENT
+          key: wttr.temp.fahrenheit
+          history: 30d
+          trends: 730d
+          units: ºF
+          description: 'WTTR temperature in Fahrenheit for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].temp_F'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 2ef6fb5a545f44148b93fe9e2091753d
+          name: 'Temperature Feels Like Celsius'
+          type: DEPENDENT
+          key: wttr.temp.feelslike.celsius
+          history: 30d
+          trends: 730d
+          units: ºC
+          description: 'WTTR Feels Like temperature in Celsius for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].FeelsLikeC'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 5b936c44cff14ca6a0496b623c3cd5ee
+          name: 'Temperature Feels Like Fahrenheit'
+          type: DEPENDENT
+          key: wttr.temp.feelslike.fahrenheit
+          history: 30d
+          trends: 730d
+          units: ºF
+          description: 'WTTR Feels Like temperature in Fahrenheit for the provided location'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].FeelsLikeF'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: temperature
+        - uuid: 2e5c7042592241ce8ab0e6efaa47ee23
+          name: 'UV Index'
+          type: DEPENDENT
+          key: wttr.uvindex
+          history: 30d
+          trends: 730d
+          description: 'WTTR UV Index for the provided location'
+          valuemap:
+            name: 'UV Index'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.current_condition[0].uvIndex'
+          master_item:
+            key: wttr.json
+          tags:
+            - tag: Wttr
+              value: uvindex
+          triggers:
+            - uuid: c34b35b6bccf4ea085e338d11813fc71
+              expression: 'last(/WTTR by HTTP/wttr.uvindex,#1)>=6'
+              name: 'UV Index High'
+              event_name: 'UV Index High of {ITEM.VALUE}'
+              opdata: 'Current Index: {ITEM.LASTVALUE}'
+              url: 'https://wttr.in//{$WTTR_LOCATION}'
+              priority: WARNING
+              description: |
+                UV Index is High at the provided location
+                
+                Seek shade during midday hours
+                Slip on a shirt
+                slop on sunscreen and slap on hat
+              manual_close: 'YES'
+              tags:
+                - tag: Uvindex
+                  value: high
+            - uuid: a5110ac4fe9942a0878db73d20f4c641
+              expression: 'last(/WTTR by HTTP/wttr.uvindex,#1)>=8'
+              name: 'UV Index Very High'
+              event_name: 'UV Index Very High of {ITEM.VALUE}'
+              opdata: 'Current Index: {ITEM.LASTVALUE}'
+              url: 'https://wttr.in//{$WTTR_LOCATION}'
+              priority: AVERAGE
+              description: |
+                UV Index is very high at the provided location
+                
+                Seek shade during midday hours
+                Slip on a shirt
+                slop on sunscreen and slap on hat
+              manual_close: 'YES'
+              dependencies:
+                - name: 'UV Index High'
+                  expression: 'last(/WTTR by HTTP/wttr.uvindex,#1)>=6'
+              tags:
+                - tag: Uvindex
+                  value: very_high
+      tags:
+        - tag: Weather
+          value: WTTR
+      macros:
+        - macro: '{$WTTR_LANGUAGE}'
+          value: en
+          description: 'Available languages: https://wttr.in/:translation'
+        - macro: '{$WTTR_LOCATION}'
+          description: 'Place your location here. If empty, IP will be used to track the location. Multiple locations may be separated by comma. [Latitude,Longitude] supported.'
+        - macro: '{$WTTR_UNIT}'
+          value: m
+          description: 'Unit types: m=metric (default), u=USCS, M=metric with m/s'
+      valuemaps:
+        - uuid: 508cbf8c952e48a4972822cbbc47a96d
+          name: 'UV Index'
+          mappings:
+            - type: LESS_OR_EQUAL
+              value: '2'
+              newvalue: Low
+            - type: IN_RANGE
+              value: 3-5
+              newvalue: Moderate
+            - type: IN_RANGE
+              value: 6-7
+              newvalue: High
+            - type: IN_RANGE
+              value: 8-10
+              newvalue: 'Very High'
+            - type: GREATER_OR_EQUAL
+              value: '11'
+              newvalue: Extreme
