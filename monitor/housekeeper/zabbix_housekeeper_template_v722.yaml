@@ -10,7 +10,7 @@ zabbix_export:
       description: 'Zabbix Server Housekeeper statistics'
       vendor:
         name: diasdm
-        version: 7.0-5
+        version: 7.2-2
       groups:
         - name: Templates/Applications
       items:

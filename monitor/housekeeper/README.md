@@ -13,7 +13,7 @@
 
 ## OVERVIEW
 
-This is a simple template that checks the records deleted by the Housekeeper process.
+This is a simple template that checks the records deleted by the Housekeeper process and its execution time.
 
 <BR>
 
