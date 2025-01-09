@@ -5,7 +5,7 @@
 
 <div align="right">
 
-[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-705-blue?logo=zotero&color=0aa8d2)](./zabbix_housekeeper_template_v705.yaml)
+[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-722-blue?logo=zotero&color=0aa8d2)](./zabbix_housekeeper_template_v722.yaml)
 
 </div>
 
@@ -24,7 +24,7 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 <BR>
 
 ---
-### ➡️ [Download](./zabbix_housekeeper_template_v705.yaml)
+### ➡️ [Download](./zabbix_housekeeper_template_v722.yaml)
 ---
 #### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
 ---
