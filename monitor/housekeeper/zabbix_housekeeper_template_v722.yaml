@@ -1,12 +1,12 @@
 zabbix_export:
-  version: '7.0'
+  version: '7.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
     - uuid: 39cc630e39f241deacd1579c72aa882f
-      template: 'Zabbix Server Housekeeper Stats'
-      name: 'Zabbix Server Housekeeper Stats'
+      template: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
+      name: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
       description: 'Zabbix Server Housekeeper statistics'
       vendor:
         name: diasdm
@@ -21,7 +21,6 @@ zabbix_export:
           delay: 10m
           history: '0'
           value_type: LOG
-          trends: '0'
           description: 'Master item that collects housekeeper log messages'
           logtimefmt: 'pppppp:yyyyMMdd:hhmmss'
           tags:
@@ -31,7 +30,6 @@ zabbix_export:
           name: 'Alarm Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[alarms]'
-          delay: '0'
           history: 30d
           description: 'Number of alarm records deleted on the last run of the Zabbix Housekeeper process'
           preprocessing:
@@ -48,7 +46,6 @@ zabbix_export:
           name: 'Audit Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[audit]'
-          delay: '0'
           history: 30d
           description: 'Number of audit records deleted on the last run of the Zabbix Housekeeper process'
           preprocessing:
@@ -65,7 +62,6 @@ zabbix_export:
           name: 'Autoregistration Host Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[autoreg_host]'
-          delay: '0'
           history: 30d
           description: 'Number of autoregistration host records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -82,7 +78,6 @@ zabbix_export:
           name: 'Event Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[events]'
-          delay: '0'
           history: 30d
           description: 'Number of event records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -99,7 +94,6 @@ zabbix_export:
           name: 'History and Trend Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[history]'
-          delay: '0'
           history: 30d
           description: 'Number of history and trend records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -118,7 +112,6 @@ zabbix_export:
           name: 'Item and Trigger Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[items]'
-          delay: '0'
           history: 30d
           description: 'Number of item and trigger records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -137,7 +130,6 @@ zabbix_export:
           name: 'Problem Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[problems]'
-          delay: '0'
           history: 30d
           description: 'Number of problem records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -154,7 +146,6 @@ zabbix_export:
           name: 'Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[records]'
-          delay: '0'
           history: 30d
           description: 'Number of records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -171,7 +162,6 @@ zabbix_export:
           name: 'Session Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[sessions]'
-          delay: '0'
           history: 30d
           description: 'Number of session records deleted on the last execution of the Zabbix Housekeeper process'
           preprocessing:
@@ -188,7 +178,6 @@ zabbix_export:
           name: 'Execution Time'
           type: DEPENDENT
           key: 'zabbix.housekeeper.exec[time]'
-          delay: '0'
           history: 30d
           value_type: FLOAT
           units: s
@@ -205,11 +194,11 @@ zabbix_export:
               value: Time
           triggers:
             - uuid: 8042276c7b764d5e9d68ba4e53b68146
-              expression: 'last(/Zabbix Server Housekeeper Stats/zabbix.housekeeper.exec[time])>{$HOUSEKEEPER.EXEC.WARN}'
+              expression: 'trendavg(/Zabbix Server Housekeeper Stats by Zabbix Agent Active/zabbix.housekeeper.exec[time],1d:now/h)>{$HOUSEKEEPER.EXEC.WARN}'
               name: 'Housekeeper execution time is High'
-              opdata: 'Execution Time: {ITEM.LASTVALUE}'
+              opdata: 'Last execution time: {ITEM.LASTVALUE}'
               priority: WARNING
-              description: 'Zabbix Housekeeper execution time is higher than the configured warning limit'
+              description: 'Zabbix Housekeeper average execution time for the last 24h is higher than the configured warning limit'
               tags:
                 - tag: Time
                   value: high
@@ -254,7 +243,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[history]'
                     - type: INTEGER
                       name: show.0
@@ -391,7 +380,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[items]'
                     - type: INTEGER
                       name: show.0
@@ -447,7 +436,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[events]'
                     - type: INTEGER
                       name: show.0
@@ -503,7 +492,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[problems]'
                     - type: INTEGER
                       name: show.0
@@ -638,7 +627,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[alarms]'
                     - type: INTEGER
                       name: show.0
@@ -694,7 +683,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Zabbix Server Housekeeper Stats'
+                        host: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
                         key: 'zabbix.housekeeper.del[audit]'
                     - type: INTEGER
                       name: show.0
