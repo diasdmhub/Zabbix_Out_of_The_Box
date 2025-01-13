@@ -22,7 +22,7 @@ zabbix_export:
           history: '0'
           value_type: LOG
           description: 'Master item that collects housekeeper log messages'
-          logtimefmt: 'pppppp:yyyyMMdd:hhmmss'
+          logtimefmt: 'pppppp:yyyyMMdd:hhmmss.nnn'
           tags:
             - tag: Log
               value: Housekeeper
@@ -194,7 +194,7 @@ zabbix_export:
               value: Time
           triggers:
             - uuid: 8042276c7b764d5e9d68ba4e53b68146
-              expression: 'trendavg(/Zabbix Server Housekeeper Stats by Zabbix Agent Active/zabbix.housekeeper.exec[time],1d:now/h)>{$HOUSEKEEPER.EXEC.WARN}'
+              expression: 'trendavg(/Zabbix Server Housekeeper Stats by Zabbix Agent Active/zabbix.housekeeper.exec[time],24h:now/h)>{$HOUSEKEEPER.TIME.WARN}'
               name: 'Housekeeper execution time is High'
               opdata: 'Last execution time: {ITEM.LASTVALUE}'
               priority: WARNING
@@ -206,7 +206,7 @@ zabbix_export:
         - tag: Zabbix
           value: housekeeper
       macros:
-        - macro: '{$HOUSEKEEPER.EXEC.WARN}'
+        - macro: '{$HOUSEKEEPER.TIME.WARN}'
           value: '60'
           description: 'Time limit in seconds for Housekeeper execution time warning'
       dashboards:

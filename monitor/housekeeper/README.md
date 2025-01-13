@@ -21,6 +21,8 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 
 - Active Zabbix Agent in the Zabbix Server host.
 
+> ⚠️ **If the Zabbix Server/Proxy has multiple addresses, use a single address in the Agent's `ServerActive` parameter to avoid duplicate records, or use a semicolon to separate multiple addresses and allow for high availability.**
+
 <BR>
 
 ---
