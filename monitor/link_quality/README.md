@@ -14,9 +14,9 @@
 
 ## OVERVIEW
 
-This template provides a method for checking the reliability of multiple links. It offers simple ICMP items that give an overview of a link's connectivity, performance, and degradation. These indicators provide a basic measure of target link quality and reliability.
+This template provides a method for checking the reliability of multiple links. It provides simple ICMP items that give an overview of a link's connectivity, performance, and degradation. These indicators provide a basic measure of the quality and reliability of the target link. It is based on the OOTB "_ICMP Ping_" template and enhanced to receive a list of ICMP targets.
 
-A manual address list is configure for each host to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dinamically creates simple ICMP items for each address. It was designed primarily for Internet but can be used for most types of links, such as WAN, LAN and VPN.
+A manual address list is configured to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dynamically creates simple ICMP items for each address. It was designed primarily for Internet addresses, but can be used for most types of links, such as WAN, LAN and VPN.
 
 <BR>
 
