@@ -7,7 +7,11 @@ zabbix_export:
     - uuid: 39cc630e39f241deacd1579c72aa882f
       template: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
       name: 'Zabbix Server Housekeeper Stats by Zabbix Agent Active'
-      description: 'Zabbix Server Housekeeper statistics'
+      description: |
+        Zabbix Server Housekeeper statistics
+        
+        by diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/
       vendor:
         name: diasdm
         version: 7.2-2

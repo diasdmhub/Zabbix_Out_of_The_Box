@@ -17,11 +17,11 @@ zabbix_export:
         
         It is suggested to create a host for each location and set the host interface as the WTTR DNS address, something like "wttr.in".
         
-        By diasdm
-        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/tree/main/monitor/wttr
+        by diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/
       vendor:
         name: diasdm
-        version: 7.2-1
+        version: 7.2-2
       groups:
         - name: Templates/Modules
       items:

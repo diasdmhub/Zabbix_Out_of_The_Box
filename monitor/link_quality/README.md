@@ -63,6 +63,8 @@ A manual address list is configure for each host to obtain the ICMP destinations
 | {$ICMP.REPEAT.COUNT} | `4`           | Number of ICMP packets sent to the destination address. |
 | {$ICMP.TIMEOUT}      | `200`         | RTT timeout of each ICMP packet in miliseconds. |
 
+> **The default values can be very conservative and sensitive, and it is recommended that you customize them for your own environment.**
+
 <BR>
 
 ## ITEMS
