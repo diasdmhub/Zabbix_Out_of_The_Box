@@ -13,7 +13,7 @@ zabbix_export:
         A manual address list is configure for each host to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dinamically creates simple ICMP items for each address. It was designed primarily for Internet but can be used for most types of links, such as WAN, LAN and VPN.
         
         by diasdm
-        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/tree/main/monitor/link_quality
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/
         
         ### REQUIREMENTS
         
