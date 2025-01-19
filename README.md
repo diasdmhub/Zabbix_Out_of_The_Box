@@ -19,6 +19,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 ### Templates
 
 - [Domain RDAP template](./monitor/rdap/)
+- [Link Quality template](./monitor/link_quality/)
 - [Windows Files Discovery template](./monitor/dir_list/)
 - [Zabbix Housekeeper template](./monitor/housekeeper/)
 - [Zabbix WTTR.in template](./monitor/wttr/)

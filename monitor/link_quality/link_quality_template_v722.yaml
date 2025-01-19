@@ -1,0 +1,222 @@
+zabbix_export:
+  version: '7.2'
+  template_groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: c0e468c396af497f82d964becce38ed7
+      template: 'Link Quality by Simple Check'
+      name: 'Link Quality by Simple Check'
+      description: |
+        This template provides a method for checking the reliability of multiple links. It offers simple ICMP items that give an overview of a link's connectivity, performance, and degradation. These indicators provide a basic measure of target link quality and reliability.
+        
+        A manual address list is configure for each host to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dinamically creates simple ICMP items for each address. It was designed primarily for Internet but can be used for most types of links, such as WAN, LAN and VPN.
+        
+        by diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/tree/main/monitor/link_quality
+        
+        ### REQUIREMENTS
+        
+        - Since the discovered items are Simple Checks, the Zabbix Server/Proxy must be allowed to ping the destination target.
+        - If DNS names are used, the Zabbix Server/Proxy must be able to resolve them.
+        
+        ### SETUP
+        
+        1. The template's "{$ICMP.ADDRESS.LIST}" macro is empty by default and is intended for host-level configuration.
+        2. Configure the "{$ICMP.ADDRESS.LIST}" macro with IPs or DNS addresses separated by commas ( , ).
+            - Example: 1.2.3.4,5.6.7.8,target.domain,public.com
+        3. The master item is updated once a day to reflect any changes in the host macro.
+            - If the macro is changed, it is possible to run the "execute now" command and update the list. This executes the discovery rule.
+        
+        Below are some of the major BigTech domains commonly used to test Internet connectivity.
+        
+        - Google - connectivitycheck.gstatic.com
+        - Cloudflare - engage.cloudflareclient.com
+        - Microsoft - internetbeacon.msedge.net
+      vendor:
+        name: diasdm
+        version: 7.2-2
+      groups:
+        - name: Templates/Modules
+      items:
+        - uuid: adf4fc5cd4b742eca98bc3f647cc3ab2
+          name: 'ICMP Address List'
+          type: CALCULATED
+          key: icmp.address.list
+          delay: 1d
+          history: 1d
+          value_type: TEXT
+          params: '"ADDRESS,{$ICMP.ADDRESS.LIST}"'
+          description: |
+            This item takes a comma-separated list of ICMP destination addresses and converts it to a JSON array. This array is used by the ICMP Address Discovery rule to dynamically create items.
+            
+            The "$ICMP.ADDRESS.LIST" macro is intended to be configured at the host level.
+            
+            The item is updated once a day to reflect changes in the macro.
+            If the macro is changed, it is possible to run the execute now command and update the list. This will execute the discovery rule.
+          preprocessing:
+            - type: STR_REPLACE
+              parameters:
+                - ','
+                - \n
+            - type: CSV_TO_JSON
+              parameters:
+                - ','
+                - '"'
+                - '1'
+          tags:
+            - tag: Address
+              value: list
+      discovery_rules:
+        - uuid: 5ed4e6cf97d944e8afdefe7de0120240
+          name: 'ICMP Address Discovery'
+          type: DEPENDENT
+          key: icmp.address.discovery
+          lifetime: 5d
+          description: |
+            This LLD takes the master item JSON array of ICMP destination addresses and converts it to an LLD JSON array. This array is looped through to dynamically create host items for each address in the array.
+            
+            Each address from the array is converted to the "{#ICMP.ADDRESS}" LLD macro.
+            
+            This discovery is performed each time the master item is updated or when the execute now command is run. If the user macro is updated, it will reflect any changes.
+          item_prototypes:
+            - uuid: 8ea846d2f9254e0ebf1f2789223d0827
+              name: 'ICMP Jitter from {#ICMP.ADDRESS}'
+              type: CALCULATED
+              key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              delay: 5m
+              history: 1w
+              value_type: FLOAT
+              units: s
+              params: 'abs(change(//icmppingsec[{#ICMP.ADDRESS},4,50,,200]))'
+              description: 'ICMP response time variation from the destination address {#ICMP.ADDRESS} taking into account previous and latest value'
+              tags:
+                - tag: ICMP
+                  value: jitter
+                - tag: Target
+                  value: '{#ICMP.ADDRESS}'
+            - uuid: bc141ea8039d48a1bf80944d74389883
+              name: 'ICMP Loss from {#ICMP.ADDRESS}'
+              type: SIMPLE
+              key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              delay: 5m
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              description: 'ICMP percentage of packets lost from the destination address {#ICMP.ADDRESS}'
+              tags:
+                - tag: ICMP
+                  value: loss
+                - tag: Target
+                  value: '{#ICMP.ADDRESS}'
+              trigger_prototypes:
+                - uuid: a560611b6537485d8807cef082ef4a4d
+                  expression: |
+                    min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)>={$ICMP.LOSS.WARN}
+                    or
+                    last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}])>{$ICMP.LOSS.WARN} * 2
+                  name: '{#ICMP.ADDRESS} High ICMP loss'
+                  opdata: 'Loss: {ITEM.VALUE}'
+                  priority: WARNING
+                  description: |
+                    Last and previous ICMP ping attempts returned at least {$ICMP.LOSS.WARN}% of packet loss,
+                    or
+                    The latest ICMP ping attempt returned more than {$ICMP.LOSS.WARN}% packet loss.
+                  dependencies:
+                    - name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
+                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                  tags:
+                    - tag: Loss
+                      value: high
+            - uuid: 644e0c27c6d6417aaefa95b8fb6a08f1
+              name: 'ICMP Response Time from {#ICMP.ADDRESS}'
+              type: SIMPLE
+              key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              delay: 5m
+              history: 1w
+              value_type: FLOAT
+              units: s
+              description: 'ICMP response time in seconds from the destination address {#ICMP.ADDRESS}'
+              tags:
+                - tag: ICMP
+                  value: latency
+                - tag: Target
+                  value: '{#ICMP.ADDRESS}'
+              trigger_prototypes:
+                - uuid: a9e3bae6f8294f419f3153049bba529b
+                  expression: 'last(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#1)>{$ICMP.LATENCY.WARN}'
+                  name: '{#ICMP.ADDRESS} High ICMP ping response time'
+                  opdata: 'Latency: {ITEM.VALUE}'
+                  priority: WARNING
+                  description: 'The last ICMP ping response time was higher than {$ICMP.LATENCY.WARN}s'
+                  dependencies:
+                    - name: '{#ICMP.ADDRESS} High ICMP loss'
+                      expression: |
+                        min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)>={$ICMP.LOSS.WARN}
+                        or
+                        last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}])>{$ICMP.LOSS.WARN} * 2
+                    - name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
+                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                  tags:
+                    - tag: Latency
+                      value: high
+                - uuid: 20d64316c5d34fd2a1a08575566da1c7
+                  expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                  name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
+                  priority: HIGH
+                  description: |
+                    The last two ICMP ping attempts to {#ICMP.ADDRESS} have timed out
+                    Check target connectivity
+                  tags:
+                    - tag: Latency
+                      value: unavailable
+          graph_prototypes:
+            - uuid: 60effe6a646d4f28a8a5f91d240dbd26
+              name: 'ICMP Ping Response Time from {#ICMP.ADDRESS}'
+              percent_left: '95'
+              ymin_type_1: FIXED
+              graph_items:
+                - drawtype: BOLD_LINE
+                  color: AED581
+                  calc_fnc: ALL
+                  item:
+                    host: 'Link Quality by Simple Check'
+                    key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+                - sortorder: '1'
+                  drawtype: DASHED_LINE
+                  color: F63100
+                  yaxisside: RIGHT
+                  calc_fnc: ALL
+                  item:
+                    host: 'Link Quality by Simple Check'
+                    key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+                - sortorder: '2'
+                  drawtype: BOLD_LINE
+                  color: 1976D2
+                  calc_fnc: ALL
+                  item:
+                    host: 'Link Quality by Simple Check'
+                    key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+          master_item:
+            key: icmp.address.list
+          lld_macro_paths:
+            - lld_macro: '{#ICMP.ADDRESS}'
+              path: $.ADDRESS
+      tags:
+        - tag: Link
+          value: quality
+      macros:
+        - macro: '{$ICMP.ADDRESS.LIST}'
+          description: 'Comma-separated list of ICMP destination addresses. DNS names are valid if your Zabbix Server can resolve them.'
+        - macro: '{$ICMP.LATENCY.WARN}'
+          value: '0.15'
+          description: 'ICMP RTT latency warning timeout in seconds'
+        - macro: '{$ICMP.LOSS.WARN}'
+          value: '25'
+          description: 'ICMP packet loss percentage for warning threshold. Default of 4 packets sent gives a rounding rate of 25, 50, 75 or 100.'
+        - macro: '{$ICMP.REPEAT.COUNT}'
+          value: '4'
+          description: 'Number of ICMP packets sent to the destination address.'
+        - macro: '{$ICMP.TIMEOUT}'
+          value: '200'
+          description: 'RTT timeout of each ICMP packet in miliseconds.'
