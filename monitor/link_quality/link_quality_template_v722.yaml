@@ -88,7 +88,7 @@ zabbix_export:
               history: 1w
               value_type: FLOAT
               units: s
-              params: 'abs(change(//icmppingsec[{#ICMP.ADDRESS},4,50,,200]))'
+              params: 'abs(change(//icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]))'
               description: 'ICMP response time variation from the destination address {#ICMP.ADDRESS} taking into account previous and latest value'
               tags:
                 - tag: ICMP
