@@ -23,7 +23,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 - [Windows Files Discovery template](./monitor/dir_list/)
 - [Zabbix Housekeeper template](./monitor/housekeeper/)
 - [Zabbix Slow Query template](./monitor/slow_query/)
-- [Zabbix WTTR.in template](./monitor/wttr/)
+- [WTTR.in template](./monitor/wttr/)
 
 <BR>
 

@@ -8,4 +8,4 @@
 - [Windows Files Discovery template](./dir_list/)
 - [Zabbix Housekeeper template](./housekeeper/)
 - [Zabbix Slow Query template](./slow_query/)
-- [Zabbix WTTR.in template](./wttr/)
+- [WTTR.in template](./wttr/)

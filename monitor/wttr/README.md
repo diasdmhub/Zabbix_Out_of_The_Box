@@ -1,7 +1,7 @@
 | [↩️ Back](../) |
 | --- |
 
-# Zabbix WTTR.in Template
+# WTTR.in by HTTP Template
 
 <div align="right">
 
