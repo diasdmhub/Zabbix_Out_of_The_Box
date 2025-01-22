@@ -41,7 +41,7 @@ A manual address list is configured to obtain the ICMP destinations, then Zabbix
 > - Cloudflare - `engage.cloudflareclient.com`
 > - Microsoft - `internetbeacon.msedge.net`
 
-> 💡 _I'm looking for more BigTech **public** addresses that are specific for conectivity checks, like captive portal or beacon addresses. (Amazon, Apple, banks, Cisco, Meta, Netflix, NVidia, Tesla, etc)_
+> 💡 _I'm looking for more BigTech **public** addresses that are specific for conectivity checks, like captive portal or beacon addresses (Amazon, Apple, banks, Cisco, Meta, Netflix, NVidia, Tesla, etc). If you know any, please report them in the issues tab._
 
 <BR>
 
