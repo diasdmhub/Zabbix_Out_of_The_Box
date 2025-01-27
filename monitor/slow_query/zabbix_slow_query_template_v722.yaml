@@ -59,7 +59,7 @@ zabbix_export:
           key: 'log.slow.query.day[total]'
           delay: 5m
           units: SQ/d
-          params: 'count(//log["{$ZBX.LOG.PATH}","slow query:\s(\d+\.\d+) sec, \"(.*)\"$",,,skip,"{\"sec\":\"\1\",\"query\":\"\2\"}"],1d,"like","sec:")'
+          params: 'count(//log.slow.query[sql],1d)'
           description: 'Zabbix log slow query total amount per day'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
