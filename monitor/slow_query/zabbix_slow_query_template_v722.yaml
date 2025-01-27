@@ -25,6 +25,20 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       items:
+        - uuid: b63eab7daecc4b0fa3590330ea14a67e
+          name: 'Slow Query per Day Commit'
+          type: CALCULATED
+          key: 'log.slow.query.day[commit]'
+          delay: 5m
+          params: 'count(//log.slow.query[sql],1d,"regexp","^commit")'
+          description: 'Zabbix slow query log count of commits per day'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: Slow_query
+              value: commit
         - uuid: f5fc02b35abd4806994a32030f53ef55
           name: 'Slow Query per Day Delete'
           type: CALCULATED
@@ -84,7 +98,6 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[update]'
           delay: 5m
-          value_type: FLOAT
           params: 'count(//log.slow.query[sql],1d,"regexp","^update")'
           description: 'Zabbix slow query log count of updates per day'
           preprocessing:

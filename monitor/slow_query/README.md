@@ -53,10 +53,11 @@ This template collects the slow query statistics from the Zabbix Server log with
 | Slow Query Log Statistics                  | Master item that collects slow query records from the Zabbix Server log |
 | Slow Query Log Statistics: Slow Query SQL  | Zabbix slow query log recorded SQL query |
 | Slow Query Log Statistics: Slow Query Time | Zabbix slow query log time in seconds |
-| Slow Query per Day Delete                  | Zabbix slow query log amount of deletes per day |
-| Slow Query per Day Insert                  | Zabbix slow query log amount of inserts per day |
-| Slow Query per Day Update                  | Zabbix slow query log amount of updates per day |
-| Slow Query per Day Total                   | Zabbix slow query log total amount per day |
+| Slow Query per Day Commit                  | Zabbix slow query log count of commits per day |
+| Slow Query per Day Delete                  | Zabbix slow query log count of deletes per day |
+| Slow Query per Day Insert                  | Zabbix slow query log count of inserts per day |
+| Slow Query per Day Update                  | Zabbix slow query log count of updates per day |
+| Slow Query per Day Total                   | Zabbix slow query log total count per day |
 
 <BR>
 
