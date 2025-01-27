@@ -31,7 +31,7 @@ zabbix_export:
           key: 'log.slow.query.day[delete]'
           delay: 5m
           params: 'count(//log.slow.query[sql],1d,"regexp","^delete")'
-          description: 'Zabbix log slow query amount of deletes per day'
+          description: 'Zabbix slow query log count of deletes per day'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -45,7 +45,7 @@ zabbix_export:
           key: 'log.slow.query.day[insert]'
           delay: 5m
           params: 'count(//log.slow.query[sql],1d,"regexp","^insert")'
-          description: 'Zabbix log slow query amount of inserts per day'
+          description: 'Zabbix slow query log count of inserts per day'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -60,7 +60,7 @@ zabbix_export:
           delay: 5m
           units: SQ/d
           params: 'count(//log.slow.query[sql],1d)'
-          description: 'Zabbix log slow query total amount per day'
+          description: 'Zabbix slow query log total count total per day'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -86,7 +86,7 @@ zabbix_export:
           delay: 5m
           value_type: FLOAT
           params: 'count(//log.slow.query[sql],1d,"regexp","^update")'
-          description: 'Zabbix log slow query amount of updates per day'
+          description: 'Zabbix slow query log count of updates per day'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -99,7 +99,7 @@ zabbix_export:
           type: DEPENDENT
           key: 'log.slow.query[sql]'
           value_type: TEXT
-          description: 'Zabbix log slow query recorded SQL query'
+          description: 'Zabbix slow query log recorded SQL query'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -115,7 +115,7 @@ zabbix_export:
           key: 'log.slow.query[time]'
           value_type: FLOAT
           units: s
-          description: 'Zabbix log slow query time in seconds'
+          description: 'Zabbix slow query log time in seconds'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -146,7 +146,7 @@ zabbix_export:
       macros:
         - macro: '{$SLOW.QUERY.WARN}'
           value: '10'
-          description: 'Slow query threshold for trigger warning'
+          description: 'Slow query daily count threshold for trigger warning'
         - macro: '{$ZBX.LOG.PATH}'
           value: /var/log/zabbix/zabbix_server.log
           description: 'Zabbix Server log absolute path. Change this value if it is different from the default'

@@ -40,7 +40,7 @@ This template collects the slow query statistics from the Zabbix Server log with
 | Macro                | Default Value                       | Description |
 | :------------------- | :---------------------------------: | :---------- |
 | `{$ZBX.LOG.PATH}`    | `/var/log/zabbix/zabbix_server.log` | Zabbix Server log absolute path. Change this value if it is different from the default |
-| `{$SLOW.QUERY.WARN}` | `10`                                | Slow query threshold for trigger warning |
+| `{$SLOW.QUERY.WARN}` | `10`                                | Slow query daily count threshold for trigger warning |
 
 > ⚠️ **The default slow query threshold is highly environment dependent and should be adjusted accordingly.**
 
@@ -51,12 +51,12 @@ This template collects the slow query statistics from the Zabbix Server log with
 | Name                                       | Description |
 | :----------------------------------------- | :---------- |
 | Slow Query Log Statistics                  | Master item that collects slow query records from the Zabbix Server log |
-| Slow Query Log Statistics: Slow Query SQL  | Zabbix log slow query recorded SQL query |
-| Slow Query Log Statistics: Slow Query Time | Zabbix log slow query time in seconds |
-| Slow Query per Day Delete                  | Zabbix log slow query amount of deletes per day |
-| Slow Query per Day Insert                  | Zabbix log slow query amount of inserts per day |
-| Slow Query per Day Update                  | Zabbix log slow query amount of updates per day |
-| Slow Query per Day Total                   | Zabbix log slow query total amount per day |
+| Slow Query Log Statistics: Slow Query SQL  | Zabbix slow query log recorded SQL query |
+| Slow Query Log Statistics: Slow Query Time | Zabbix slow query log time in seconds |
+| Slow Query per Day Delete                  | Zabbix slow query log amount of deletes per day |
+| Slow Query per Day Insert                  | Zabbix slow query log amount of inserts per day |
+| Slow Query per Day Update                  | Zabbix slow query log amount of updates per day |
+| Slow Query per Day Total                   | Zabbix slow query log total amount per day |
 
 <BR>
 
