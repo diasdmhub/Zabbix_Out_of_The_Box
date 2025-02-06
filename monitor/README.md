@@ -1,6 +1,12 @@
 | [↩️ Back](../) |
 | --- |
 
+# TEMPLATES
+
+A collection of Zabbix templates designed to assist in the efficient management and monitoring of your systems, with each template containing descriptive information about the data being monitored.
+
+<BR>
+
 ## INDEX
 
 - [AdGuard Home template](https://github.com/diasdmhub/AdGuard_Home_Zabbix_Template)
