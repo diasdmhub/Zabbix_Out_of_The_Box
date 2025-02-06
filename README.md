@@ -18,12 +18,15 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ### Templates
 
+- [AdGuard Home template](https://github.com/diasdmhub/AdGuard_Home_Zabbix_Template)
+- [Asus WRT Merlin Routers](https://github.com/diasdmhub/Asus_Merlin_Zabbix_Template)
 - [Domain RDAP template](./monitor/rdap/)
 - [Link Quality template](./monitor/link_quality/)
+- [NVR Intelbras / Dahua by SNMP template](https://github.com/diasdmhub/Intelbras_NVR_Zabbix_Template)
 - [Windows Files Discovery template](./monitor/dir_list/)
+- [WTTR.in template](./monitor/wttr/)
 - [Zabbix Housekeeper template](./monitor/housekeeper/)
 - [Zabbix Slow Query template](./monitor/slow_query/)
-- [WTTR.in template](./monitor/wttr/)
 
 <BR>
 
