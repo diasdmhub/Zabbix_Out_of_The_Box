@@ -32,9 +32,9 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ### Codes
 
-- [JavaScript Preprocessing](./javascript_preprocessing/)
-    - [JavaScript Add Property](./javascript_preprocessing/javascript_add_property.md)
-    - [JavaScript Remove Property](./javascript_preprocessing/javascript_remove_property.md)
+- [JavaScript](./javascript/)
+    - [JavaScript Add Property](./javascript/javascript_add_property.md)
+    - [JavaScript Remove Property](./javascript/javascript_remove_property.md)
 
 <BR>
 
