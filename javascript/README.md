@@ -15,8 +15,9 @@ Keep in mind that JavaScript preprocessing uses a function body and the input va
 
 ## INDEX
 
-- [JavaScript Add Property](./javascript_add_property.md)
-- [JavaScript Remove Property](./javascript_remove_property.md)
+- [Add Property](./javascript_add_property.md)
+- [Change Item Values with Macros](./javascript_macro_value.md)
+- [Remove Property](./javascript_remove_property.md)
 
 
 [1]: https://www.zabbix.com/documentation/current/en/manual/config/items/preprocessing/javascript
