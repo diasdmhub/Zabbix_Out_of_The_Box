@@ -3,11 +3,11 @@
 
 # CHANGE OBJECT VALUES WITH MACROS
 
-Sometimes items may pull data that is inaccurate or incorrect. This can happen for many reasons, including configuration errors, bugs, or unexpected behavior of the monitored object. When this happens, it is best to fix the data at the source, but this is not always possible. Even if the solution is known, the monitored objected may have restricted access, or there may be no communication with the maintainers. Or, it may simply be a bug that the vendor has not yet fixed. Other times, it may be necessary to manipulate data without changing the source configuration.
+Sometimes items may pull data that is inaccurate or incorrect. This can happen for many reasons, including configuration errors, bugs, or unexpected behavior of the monitored object. When this happens, it is best to fix the data at the source, but this is not always possible. Even if the solution is known, the monitored objected may have restricted access, or there may be no communication with the maintainers. Or it may simply be a bug that the vendor has not yet fixed. Other times, it may be necessary to manipulate data without changing the source configuration.
 
 To help manipulate object values, a **hard override** can be applied to the monitored object, where the **source data is changed based on [user macros with context][user_macro] and [Javascript preprocessing][javascript_preprocessing]**.
 
-> ⚠️ **Note that that applying this "override" is a possible workaround solution, and does not replace a permanent fix to the source data.**
+> ⚠️ **Note that that applying this override is a possible workaround solution, and does not replace a permanent fix to the source data.**
 
 <BR>
 
@@ -37,7 +37,7 @@ if ( {$MACRO.NAME:"CONTEXT"} == 0 ) {
 
 The `{$MACRO.NAME:"CONTEXT"}` represents the user macro name (`$MACRO.NAME`) with a context (`CONTEXT`) appended.
 
-This code is a simple yet effective example of how to change the value of an item based on a [user macro with context][user_macro]. The item value is only changed if the item context matches the macro context, and the macro value is different than `0`.
+This code is a simple yet effective example of how to change the value of an item based on a [user macro with context][user_macro]. The item value is only changed if the context on the host macro matches the item context and the macro value is not `0`.
 
 #### Basically
 
@@ -56,7 +56,7 @@ However, if the macro has a value other than 0,
 
 Many network devices allow you to manually configure an Ethernet interface speed, and sometimes it is misconfigured, or the automatic configuration has a mismatch. However, for whatever reason, it is not always possible to fix this misconfiguration. So, this macro override can be applied.
 
-### 1. Consider a Zabbix item that collects an Ethernet interface speed value of `0 Gbps`.
+#### 1. Consider a Zabbix item that collects an Ethernet interface speed value of `0 Gbps`.
 
 For some reason, a device is reporting a speed of `0` for the `bridge` interface and this is interfering with the Zabbix interface graph. The interface speed should be the Y-axis max value on the graph, but because it is `0`, Zabbix displays an error.
 
@@ -64,21 +64,21 @@ For some reason, a device is reporting a speed of `0` for the `bridge` interface
 
 <BR>
 
-### 2. Now, a user macro with a context can be created on the host level
+#### 2. Now, a user macro with a context can be created on the host level
 
-For this example, the script is included in the `Interface {#IFNAME}: Speed` item prototype from the `Network interfaces discovery` LLD. The `{$NET.IF.SPEED}` macro is included at the template level with a value of `0` so that all interfaces can use this override, but only those with a value greater than `0` will actually be overridden.
+The `{$NET.IF.SPEED}` macro is included at the **template level** with a value of `0` so that all interfaces can use this override, but only those with a value other than `0` will actually be overridden.
 
 ![Interface speed macro](./image/js_macro_template.png)
 
-The `{$NET.IF.SPEED:"bridge"}` macro with context is then created at the host level so that the Javascript preprocessing script is applied with the specific `bridge` context. This indicates that only the interface named `bridge` will be overridden, causing the interface speed item to assume the macro value.
+The `{$NET.IF.SPEED:"bridge"}` macro with context is then created at the **host level** so that the Javascript preprocessing script is applied with the specific `bridge` context. This indicates that only the interface named `bridge` will be overridden, causing the interface speed item to assume the macro value.
 
 ![Interface speed macro](./image/js_macro_int_speed.png)
 
 <BR>
 
-### 3. A Javascript preprocessing script is added to the item
+#### 3. A Javascript preprocessing script is added to the item
 
-The item gets a new preprocessing step with the following Javascript, which expects the user macro with a context.
+For this example, the script is included in the `Interface {#IFNAME}: Speed` item prototype from the `Network interfaces discovery` LLD. The item gets a new preprocessing step with the following Javascript, which expects the user macro with a context.
 
 ```javascript
 if ( {$NET.IF.SPEED:"{#IFNAME}"} == 0 ) {
