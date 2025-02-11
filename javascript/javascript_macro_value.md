@@ -56,7 +56,7 @@ However, if the macro has a value other than 0,
 
 Many network devices allow you to manually configure an Ethernet interface speed, and sometimes it is misconfigured, or the automatic configuration has a mismatch. However, for whatever reason, it is not always possible to fix this misconfiguration. So, this macro override can be applied.
 
-#### 1. Consider a Zabbix item that collects an Ethernet interface speed value of `0 Gbps`.
+#### 1. Consider a Zabbix item that collects an Ethernet interface speed
 
 For some reason, a device is reporting a speed of `0` for the `bridge` interface and this is interfering with the Zabbix interface graph. The interface speed should be the Y-axis max value on the graph, but because it is `0`, Zabbix displays an error.
 
@@ -64,7 +64,7 @@ For some reason, a device is reporting a speed of `0` for the `bridge` interface
 
 <BR>
 
-#### 2. Now, a user macro with a context can be created on the host level
+#### 2. A user macro with a context can be created
 
 The `{$NET.IF.SPEED}` macro is included at the **template level** with a value of `0` so that all interfaces can use this override, but only those with a value other than `0` will actually be overridden.
 
