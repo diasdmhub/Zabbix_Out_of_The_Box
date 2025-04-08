@@ -26,6 +26,7 @@ SELENIUMTAG="latest"
 AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
 
 
+
 # VOLUME DIRECTORIES SET
 [ -d "$HOME/$PODNAME" ] || mkdir -p "$HOME/$PODNAME/mysql/data" ; \
     mkdir -p "$HOME/$PODNAME/mysql/conf" ; \
@@ -64,7 +65,7 @@ podman create \
     --tz=local \
     --label "$AUTOUPDATEREG" \
     -e MYSQL_ROOT_PASSWORD="$DBROOTPASS" \
-    mysql:"$DBTAG" \
+    docker.io/mysql:"$DBTAG" \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_bin
 
@@ -94,7 +95,7 @@ podman create \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
     -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
     -e ZBX_STARTBROWSERPOLLERS=4 \
-    zabbix/zabbix-server-mysql:"$ZBXTAG"
+    docker.io/zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
 printf "\n$ZBXSERVERNAME-web-nginx-mysql CONTAINER CREATION\n"
@@ -115,7 +116,7 @@ podman create \
     -e ZBX_SERVER_NAME="${ZBXSERVERNAME}_Pod" \
     -e PHP_TZ="$TIMEZ" \
     -e EXPOSE_WEB_SERVER_INFO="on" \
-    zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
+    docker.io/zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
 printf "\n$ZBXSERVERNAME-snmptraps CONTAINER CREATION\n"
@@ -127,7 +128,7 @@ podman create \
     --tz=local \
     --init \
     --label "$AUTOUPDATEREG" \
-    zabbix/zabbix-snmptraps:"$ZBXTAG"
+    docker.io/zabbix/zabbix-snmptraps:"$ZBXTAG"
 
 # ZABBIX WEB SERVICE CONTAINER
 printf "\n$ZBXSERVERNAME-web-service CONTAINER CREATION\n"
@@ -141,7 +142,7 @@ podman create \
     --cap-add=SYS_ADMIN \
     --label "$AUTOUPDATEREG" \
     -e ZBX_ALLOWEDIP="$ZBXSERVERNAME-server" \
-    zabbix/zabbix-web-service:"$ZBXTAG"
+    docker.io/zabbix/zabbix-web-service:"$ZBXTAG"
 
 # ZABBIX AGENT 2 CONTAINER
 printf "\n$ZBXSERVERNAME-agent2 CONTAINER CREATION\n"
@@ -158,7 +159,7 @@ podman create \
     -e ZBX_SERVER_HOST="$ZBXSERVERNAME-server" \
     -e ZBX_PASSIVE_ALLOW="true" \
     -e ZBX_ACTIVE_ALLOW="true" \
-    zabbix/zabbix-agent2:"$ZBXTAG"
+    docker.io/zabbix/zabbix-agent2:"$ZBXTAG"
 
 # SELENIUM GRID STANDALONE WITH CHROME - For browser item
 printf "\n$ZBXSERVERNAME-selenium CONTAINER CREATION\n"
@@ -178,7 +179,7 @@ podman create \
     -e SE_BROWSER_LEFTOVERS_INTERVAL_SECS=7200 \
     -e SE_BROWSER_LEFTOVERS_PROCESSES_SECS=3600 \
     -e SE_BROWSER_LEFTOVERS_TEMPFILES_DAYS=2 \
-    selenium/standalone-chrome:"$SELENIUMTAG"
+    docker.io/selenium/standalone-chrome:"$SELENIUMTAG"
 
 
 ## SYSTEMD SET ##

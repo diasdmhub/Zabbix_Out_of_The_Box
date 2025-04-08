@@ -35,6 +35,7 @@ To help plan the environment, these are common steps to achieve a stable Zabbix 
 |                    | ✅ DBMS deployment                               | |
 |                    | ✅ [Minimum DBMS security configuration](https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/) | at least `mysql_secure_installation` |
 |                    | ✅ Advanced DBMS configuration                   | _DBA_ |
+|                    | ✅ Setup DBMS backup and optimize                | _DBA_ |
 |                    | ✅ [Zabbix database creation](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) | |
 |                    | ✅ Zabbix database user creation                 | _Different user for each Zabbix component_ |
 |                    | ✅ Zabbix Server installation                    | |
