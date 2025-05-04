@@ -65,7 +65,7 @@ This template collects the slow query statistics from the Zabbix Server log with
 
 | Name                                | Description |
 | :---------------------------------- | :---------- |
-| High Amount of Slow Queries per Day | The total amount of slow queries per day is higher than the threshold of `{$SLOW.QUERY.WARN}` |
+| High Number of Slow Queries per Day | The total amount of slow queries per day is higher than the threshold of `{$SLOW.QUERY.WARN}` |
 
 <BR>
 

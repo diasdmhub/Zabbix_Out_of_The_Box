@@ -21,7 +21,7 @@ zabbix_export:
         2. The LogSlowQueries Zabbix Server parameter must be enabled (>0) for slow queries to be logged.
       vendor:
         name: diasdm
-        version: 7.2-2
+        version: 7.2-6
       groups:
         - name: Templates/Applications
       items:
@@ -30,6 +30,7 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[commit]'
           delay: 5m
+          trends: 180d
           params: 'count(//log.slow.query[sql],1d,"regexp","^commit")'
           description: 'Zabbix slow query log count of commits per day'
           preprocessing:
@@ -44,6 +45,7 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[delete]'
           delay: 5m
+          trends: 180d
           params: 'count(//log.slow.query[sql],1d,"regexp","^delete")'
           description: 'Zabbix slow query log count of deletes per day'
           preprocessing:
@@ -58,6 +60,7 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[insert]'
           delay: 5m
+          trends: 180d
           params: 'count(//log.slow.query[sql],1d,"regexp","^insert")'
           description: 'Zabbix slow query log count of inserts per day'
           preprocessing:
@@ -72,6 +75,7 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[total]'
           delay: 5m
+          trends: 180d
           units: SQ/d
           params: 'count(//log.slow.query[sql],1d)'
           description: 'Zabbix slow query log total count total per day'
@@ -85,7 +89,7 @@ zabbix_export:
           triggers:
             - uuid: 0672d21adbff41bd8605e6ed57240c15
               expression: 'last(/Zabbix Server Slow Query Stats by Zabbix Agent Active/log.slow.query.day[total],#1)>={$SLOW.QUERY.WARN}'
-              name: 'High Amount of Slow Queries per Day'
+              name: 'High Number of Slow Queries per Day'
               event_name: 'Zabbix Server Slow Queries per Day is higher than {$SLOW.QUERY.WARN}'
               opdata: 'Slow queries / day: {ITEM.LASTVALUE}'
               priority: WARNING
@@ -98,6 +102,7 @@ zabbix_export:
           type: CALCULATED
           key: 'log.slow.query.day[update]'
           delay: 5m
+          trends: 180d
           params: 'count(//log.slow.query[sql],1d,"regexp","^update")'
           description: 'Zabbix slow query log count of updates per day'
           preprocessing:
@@ -111,6 +116,7 @@ zabbix_export:
           name: 'Slow Query SQL'
           type: DEPENDENT
           key: 'log.slow.query[sql]'
+          history: 7d
           value_type: TEXT
           description: 'Zabbix slow query log recorded SQL query'
           preprocessing:
