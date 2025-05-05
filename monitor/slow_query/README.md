@@ -71,7 +71,11 @@ This template collects the slow query statistics from the Zabbix Server log with
 
 ## DASHBOARD EXAMPLE
 
-![Zabbix Link Quality Dashboard](./image/dashboard_sample.png)
+![Zabbix Link Quality Dashboard](./image/dashboard_sample_1.png)
+
+---
+
+![Zabbix Link Quality Dashboard](./image/dashboard_sample_2.png)
 
 <BR>
 
