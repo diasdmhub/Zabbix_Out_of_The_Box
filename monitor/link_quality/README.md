@@ -6,7 +6,7 @@
 <div align="right">
 
 [![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE)
-[![Version](https://img.shields.io/badge/Version-722-blue?logo=zotero&color=0aa8d2)](./link_quality_template_v722.yaml)
+[![Version](https://img.shields.io/badge/Version-726-blue?logo=zotero&color=0aa8d2)](./link_quality_template_v726.yaml)
 
 </div>
 
@@ -14,9 +14,9 @@
 
 ## OVERVIEW
 
-This template provides a method for checking the reliability of multiple links. It provides simple ICMP items that give an overview of a link's connectivity, performance, and degradation. These indicators provide a basic measure of the quality and reliability of the target link. It is based on the OOTB "_ICMP Ping_" template and enhanced to receive a list of ICMP targets.
+This template provides a method for checking the reliability of multiple links. It provides simple ICMP items that offer an overview of a link's connectivity, performance, and degradation. These indicators provide a basic measure of the quality and reliability of the target link. It is based on the OOTB "_ICMP Ping_" template and enhanced to receive a list of ICMP targets.
 
-A manual address list is configured to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dynamically creates simple ICMP items for each address. It was designed primarily for Internet addresses, but can be used for most types of links, such as WAN, LAN and VPN.
+A manual address list is configured for each host to obtain the ICMP destinations, then Zabbix sends the list to an LLD rule which dynamically creates simple ICMP items for each address. It is primarily designed for Internet links, but can be used for most types of links, such as WAN, LAN and VPN.
 
 <BR>
 
@@ -33,9 +33,9 @@ A manual address list is configured to obtain the ICMP destinations, then Zabbix
 2. ⚠️ Configure the `{$ICMP.ADDRESS.LIST}` macro with IPs or DNS addresses separated by commas (`,`).
     - **Example**: `1.2.3.4,5.6.7.8,target.domain,public.com`
 3. The master item is updated once a day to reflect any changes in the host macro.
-    - If the macro is changed, it is possible to run the "_Execute Now_" command and update the list. This executes the discovery rule.
+    - If the macro is changed, it is possible to run the "_Execute Now_" command and update the list. This will execute the discovery rule.
 
-> Below are some of the major BigTech domains commonly used to test Internet connectivity.
+> Below are some of the major BigTech domains that are commonly used to test Internet connectivity.
 
 > - Google - `connectivitycheck.gstatic.com`
 > - Cloudflare - `engage.cloudflareclient.com`
@@ -46,9 +46,13 @@ A manual address list is configured to obtain the ICMP destinations, then Zabbix
 <BR>
 
 ---
+
 ### ➡️ [Download](./link_quality_template_v722.yaml)
+
 ---
+
 #### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+
 ---
 
 <BR>
@@ -111,9 +115,21 @@ A manual address list is configured to obtain the ICMP destinations, then Zabbix
 
 <BR>
 
+## DASHBOARD
+
+| Name         |
+| ------------ |
+| Link Quality | 
+
+<BR>
+
 ## DASHBOARD EXAMPLE
 
-![Zabbix Link Quality Dashboard](./image/dashboard_sample.png)
+![Zabbix Link Quality Dashboard 1](./image/dashboard_sample.png)
+
+---
+
+![Zabbix Link Quality Dashboard 2](./image/dashboard_sample2.png)
 
 <BR>
 
