@@ -26,8 +26,10 @@ SELENIUMTAG="latest"
 AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
 
 
-
 # VOLUME DIRECTORIES SET
+
+[ -z "$HOME" ] && { printf "\nFailed to open the home directory \"%s\"\n" "$HOME" ; exit 1; }
+
 [ -d "$HOME/$PODNAME" ] || mkdir -p "$HOME/$PODNAME/mysql/data" ; \
     mkdir -p "$HOME/$PODNAME/mysql/conf" ; \
     mkdir -p "$HOME/$PODNAME/agent" ; \
@@ -37,7 +39,7 @@ AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
 
 
 # POD CREATION
-printf "\n$PODNAME POD CREATION\n"
+printf "\n%s POD CREATION\n" "$PODNAME"
 
 podman pod create \
     --name "$PODNAME" \
@@ -55,7 +57,7 @@ podman pod create \
 ## CONTAINER SET ##
 
 # ZABBIX DBMS CONTAINER
-printf "\n$ZBXSERVERNAME-mysql CONTAINER CREATION\n"
+printf "\n%s-mysql CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-mysql \
@@ -70,7 +72,7 @@ podman create \
     --collation-server=utf8mb4_bin
 
 # ZABBIX SERVER CONTAINER
-printf "\n$ZBXSERVERNAME-server CONTAINER CREATION\n"
+printf "\n%s-server CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-server \
@@ -98,7 +100,7 @@ podman create \
     docker.io/zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
-printf "\n$ZBXSERVERNAME-web-nginx-mysql CONTAINER CREATION\n"
+printf "\n%s-web-nginx-mysql CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-web-nginx-mysql \
@@ -119,7 +121,7 @@ podman create \
     docker.io/zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
-printf "\n$ZBXSERVERNAME-snmptraps CONTAINER CREATION\n"
+printf "\n%s-snmptraps CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-snmptraps \
@@ -131,7 +133,7 @@ podman create \
     docker.io/zabbix/zabbix-snmptraps:"$ZBXTAG"
 
 # ZABBIX WEB SERVICE CONTAINER
-printf "\n$ZBXSERVERNAME-web-service CONTAINER CREATION\n"
+printf "\n%s-web-service CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-web-service \
@@ -145,7 +147,7 @@ podman create \
     docker.io/zabbix/zabbix-web-service:"$ZBXTAG"
 
 # ZABBIX AGENT 2 CONTAINER
-printf "\n$ZBXSERVERNAME-agent2 CONTAINER CREATION\n"
+printf "\n%s-agent2 CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-agent2 \
@@ -162,7 +164,7 @@ podman create \
     docker.io/zabbix/zabbix-agent2:"$ZBXTAG"
 
 # SELENIUM GRID STANDALONE WITH CHROME - For browser item
-printf "\n$ZBXSERVERNAME-selenium CONTAINER CREATION\n"
+printf "\n%s-selenium CONTAINER CREATION\n" "$ZBXSERVERNAME"
 
 podman create \
     --name $ZBXSERVERNAME-selenium \
@@ -183,32 +185,45 @@ podman create \
 
 
 ## SYSTEMD SET ##
-printf "\nSYSTEMD \"$PODNAME.service\" SERVICE CREATION\n"
+printf "\nSYSTEMD \"%s.service\" SERVICE CREATION\n" "$PODNAME"
 
-SERVDIR="$HOME/.config/systemd/user"
 
-# When logging in from another user
-if [[ -z ${XDG_RUNTIME_DIR} ]]; then
-    printf "\nXDG_RUNTIME_DIR var not set. Exporting it\n"
-    export XDG_RUNTIME_DIR="/run/user/${UID}"
-    printf '\nexport XDG_RUNTIME_DIR="/run/user/${UID}"' >> $HOME/.bashrc
+
+# Skips the next steps if the user is root
+if [ "$(id -u)" -ne 0 ]; then
+    SERVDIR="$HOME/.config/systemd/user"
+    SYSD_U_PARM="--user"
+
+    # When logging in from another user
+    if [ -z "${XDG_RUNTIME_DIR}" ]; then
+        printf "\nXDG_RUNTIME_DIR var not set. Exporting it\n"
+        export XDG_RUNTIME_DIR="/run/user/${UID}"
+        printf '\nexport XDG_RUNTIME_DIR="/run/user/%s"' "$UID" >> "$HOME"/.bashrc
+    fi
+    if [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]; then
+        printf "\nDBUS_SESSION_BUS_ADDRESS var not set. Exporting it\n"
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+        printf '\nexport DBUS_SESSION_BUS_ADDRESS="unix:path=%s/bus"' "${XDG_RUNTIME_DIR}" >> "$HOME"/.bashrc
+    fi
+
+    # CHECK FOR THE DEFAULT SYSTEMD SERVICE USER DIRECTORY
+    [ -d "$SERVDIR" ] || mkdir -v -p "$SERVDIR"
+
+    # GENERATE THE POD SYSTEMD SERVICES
+    cd "$SERVDIR"
 fi
-if [[ -z ${DBUS_SESSION_BUS_ADDRESS} ]]; then
-    printf "\nDBUS_SESSION_BUS_ADDRESS var not set. Exporting it\n"
-    export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
-    printf '\nexport DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"' >> $HOME/.bashrc
+
+if [ "$(id -u)" -eq 0 ]; then
+    cd "/usr/lib/systemd/system/" || { printf "\nFailed to open SystemD directory \"/usr/lib/systemd/system/\"\n" ; exit 1; }
+    SYSD_U_PARM=" "
 fi
 
-# CHECK FOR THE DEFAULT SYSTEMD SERVICE USER DIRECTORY
-[ -d "$SERVDIR" ] || mkdir -v -p "$SERVDIR"
-
-# GENERATE THE POD SYSTEMD SERVICES
-cd "$SERVDIR"
 podman generate systemd -f --pod-prefix "" --name "$PODNAME"
-cd ~
-systemctl --user daemon-reload
-systemctl --user enable "$PODNAME.service"
-systemctl --user start "$PODNAME.service"
-systemctl --user --no-pager status "$PODNAME.service"
+cd "$HOME"
+printf "\n"
+systemctl $SYSD_U_PARM daemon-reload
+systemctl $SYSD_U_PARM enable "$PODNAME.service"
+systemctl $SYSD_U_PARM start "$PODNAME.service"
+systemctl $SYSD_U_PARM --no-pager status "$PODNAME.service"
 
-printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):$PORTWEB\n\n"
+printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):%s\n\n" "$PORTWEB"
