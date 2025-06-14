@@ -3,7 +3,7 @@
 
 # ZABBIX INSTALLATION STEPS
 
-When deploying Zabbix in a production environment, it is advisable to plan ahead. [the official documentation](https://www.zabbix.com/documentation/current/en) is the primary reference for concepts and procedures.
+When deploying Zabbix in a production environment, it is advisable to plan ahead. [The official documentation](https://www.zabbix.com/documentation/current/en) is the primary reference for concepts and procedures.
 
 The following are common steps to help you plan a stable Zabbix monitoring environment. They are not in any particular order, but rather a logical progression from one step to the next from a requirements perspective.
 
