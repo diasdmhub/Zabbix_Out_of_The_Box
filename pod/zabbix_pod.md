@@ -231,11 +231,11 @@ The default user and password are `Admin` and `zabbix` respectively.
 
 This script creates a local directory containing the pod volumes, which are persistent on the Podman host. This makes it possible to upgrade the Zabbix instance without losing data. **Basically, to upgrade Zabbix, stop and remove the pod and the container images, then restart the main script.** It should download the latest images available from the Docker Hub and recreate the pod. If it's only a minor upgrade, Zabbix should start with no major changes as it was previously. 
 
-However, if it is a major upgrade, the local directory version number must be renamed to the newer major version. After running the script, Zabbix should start the automatic database upgrade. Depending on the data size, this process may take a while.
+However, if it is a major upgrade, the local directory version number must be renamed to the newer major version. After running the script, Zabbix should start the automatic database upgrade. Depending on the data size, this process may take a while. It is also advised to follow the container logs (_`podman logs -f zabbix[version]-server`_) while the major upgrade is running to see if it was successful. The server log should displays the message _`database upgrade fully completed`_.
 
-It is also advised to follow the container logs (_`podman logs -f zabbix[version]-server`_) while the major upgrade is running to see if it was successful. The server log should displays the message `database upgrade fully completed`.
+🔽 Bellow are some suggestions on how to upgrade the instance in a few simple steps.
 
-🔼 Bellow is a suggestion for how to upgrade the instance in a few simple steps.
+### Minor version upgrade
 
 1. Stop the Zabbix pod.
     - `systemctl --user stop zabbix[version]pod`
@@ -243,17 +243,31 @@ It is also advised to follow the container logs (_`podman logs -f zabbix[version
     - `podman pod rm zabbix[version]pod`
 3. Remove the local images.
     - `podman rmi $(podman images -a | awk '/zabbix-/ || /mysql/ || /standalone-chrome/ || /podman-pause/ {print $3}')`
-    > ⚠️ **Note that this command will remove all images containing the strings `zabbix-`, `mysql` or `standalone-chrome`. Be careful not to remove other images. If necessary, manually remove the images.**
-4. **_[For major upgrade only]_**Change the Zabbix version variables inside the script. For example:
+    > ⚠️ **Note that this command will remove all images containing the strings `zabbix-`, `mysql` or `standalone-chrome`. Be careful not to remove other unecessary images. If necessary, manually remove the container images.**
+4. Rerun the Zabbix Pod script.
+    - `./zabbixpod.sh`
+
+### Major version upgrade
+
+1. Stop the Zabbix pod.
+    - `systemctl --user stop zabbix[version]pod`
+2. Remove the pod and its containers.
+    - `podman pod rm zabbix[version]pod`
+3. Remove the local images.
+    - `podman rmi $(podman images -a | awk '/zabbix-/ || /mysql/ || /standalone-chrome/ || /podman-pause/ {print $3}')`
+    > ⚠️ **Note that this command will remove all images containing the strings `zabbix-`, `mysql` or `standalone-chrome`. Be careful not to remove other unecessary images. If necessary, manually list and remove the container images.**
+4. Change the Zabbix version variables inside the script. For example:
     > ```shell
     > # CHANGE VARIABLES HERE IF REQUIRED
     > ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
     > ZBXMINORVER="2"            # ZABBIX MINOR VERSION
     > ```
-5. **_[For major upgrade only]_** If there is a major upgrade, rename the local directory with the new major version. For example:
+5. Rename the local directory with the new major version. For example:
     - _`mv zabbix70pod zabbix72pod`_
 6. Rerun the Zabbix Pod script.
     - `./zabbixpod.sh`
+
+<BR>
 
 If everything went well, Zabbix should generate an event informing that it was updated and display the new version number.
 
