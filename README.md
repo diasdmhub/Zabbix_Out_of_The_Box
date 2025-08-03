@@ -11,6 +11,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 ### Install
 
+- [Zabbix good practices](./install/practices.md)
 - [Installation check-list](./install/install_list.md)
 - [Zabbix Podman Pod](./pod/zabbix_pod.md)
 
