@@ -87,7 +87,7 @@ This media type primarily focuses on trigger alerts and uses a webhook to commun
     - The `wa_msg_duration` parameter is set to **7 days** (_604800 seconds_) by default. If desired, set it to a different value of your choosing. Set it to `0` or leave it blank to remove the time limit.
     - If a HTTP proxy connection is required, set the proxy URL in the format of `[protocol://][username[:password]@]domain.name[:port]`. See the [HTTP agent proxy configuration][http_proxy].
 
-    ![WhatsApp GOWA parameters](./image/wa_gowa_parameters.png)
+![WhatsApp GOWA parameters](./image/wa_gowa_parameters.png)
 
 7. You can optionally further customize the WhatsApp messages in the `Media templates` tab.
 8. Make sure your media type is enabled.
@@ -96,7 +96,7 @@ This media type primarily focuses on trigger alerts and uses a webhook to commun
     - In the user's `Media` tab, add the WhatsApp GOWA media type.
     - Add the user or group ID to the `Send to` field.
 
-    ![User media configuration](./image/wa_gowa_user_media.png)
+![User media configuration](./image/wa_gowa_user_media.png)
 
 10. After setting up the media type, you can [create actions][create_actions] using the `Send message` operation with the WhatsApp GOWA media type.
 
