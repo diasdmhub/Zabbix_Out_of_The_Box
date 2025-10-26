@@ -1,0 +1,201 @@
+zabbix_export:
+  version: '7.4'
+  media_types:
+    - name: 'WhatsApp GOWA'
+      type: WEBHOOK
+      parameters:
+        - name: alert_message
+          value: '{ALERT.MESSAGE}'
+        - name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        - name: event_source
+          value: '{EVENT.SOURCE}'
+        - name: event_tag
+          value: '{EVENT.TAGS.wa_msg_id}'
+        - name: event_value
+          value: '{EVENT.VALUE}'
+        - name: gowa_domain
+          value: '<GOWA DOMAIN NAME OR IP>'
+        - name: gowa_pass
+          value: '<GOWA PASSWORD>'
+        - name: gowa_port
+          value: '3000'
+        - name: gowa_schema
+          value: http
+        - name: gowa_send_endpoint
+          value: /send/message
+        - name: gowa_user
+          value: '<GOWA USER NAME>'
+        - name: http_proxy
+        - name: to_group
+          value: 'false'
+        - name: wa_dest_id
+          value: '{ALERT.SENDTO}'
+        - name: wa_msg_duration
+          value: '604800'
+      script: |
+        // Parse the Zabbix parameters from input
+        var params = JSON.parse(value);
+        
+        // Set an HttpRequest object
+        var request = new HttpRequest();
+        
+        // Define vars
+        var response,
+            result = { tags: {} },
+            http_status,
+            gowa_url,
+            dest_id,
+            messageContent,
+            payload;
+        
+        // Normalize and validate alert message and id
+        ['alert_subject', 'alert_message', 'wa_dest_id'].forEach(function (parm) {
+            if (typeof params[parm] !== 'string' || params[parm].trim() === '') {
+                throw new Error('Required parameter not set: "' + parm + '".');
+            }
+        });
+        
+        // Validate GOWA authentication
+        ['gowa_user', 'gowa_pass'].forEach(function (parm) {
+            if (typeof params[parm] !== 'undefined' && params[parm].trim() !== '') {
+                params[parm] = params[parm].toString();
+            } else {
+                throw new Error('GOWA authentication required. "' + parm + '" not set.');
+            }
+        });
+        
+        // Validate GOWA TCP port
+        if (isNaN(params.gowa_port) || params.gowa_port < 1 || params.gowa_port > 65535) {
+            throw new Error('Invalid gowa_port parameter: Must be a TCP port number between 1 and 65535');
+        }
+        
+        // Validate optional HTTP proxy parameter input
+        if (typeof params.http_proxy === 'string' && params.http_proxy.trim() !== '') {
+            request.setProxy(params.http_proxy);
+        }
+        
+        // Set the required headers
+        request.addHeader('Content-Type: application/json');
+        request.addHeader('Authorization: Basic ' + btoa(params.gowa_user + ':' + params.gowa_pass));
+        
+        // Construct the full URL
+        gowa_url = (params.gowa_schema + "://" + params.gowa_domain + ":" + params.gowa_port + params.gowa_send_endpoint);
+        
+        // Format the destination id
+        if (params.to_group) {
+            dest_id = (params.wa_dest_id + '@g.us');
+        } else {
+            dest_id = (params.wa_dest_id + '@s.whatsapp.net');
+        }
+        
+        // Construct message
+        messageContent = (params.alert_subject + "\n\n" + params.alert_message);
+        
+        // Prepare the POST request payload
+        payload = {
+            phone: dest_id,
+            message: messageContent,
+            is_forwarded: false
+        };
+        
+        // Payload optional fields
+        if (typeof params.wa_msg_duration !== 'undefined') {
+            if (!Number.isInteger(Number(params.wa_msg_duration)) || Number(params.wa_msg_duration) < 0) {
+                throw new Error('Invalid "wa_msg_duration" parameter. It must be a positive integer value as seconds.');
+            }
+            payload.duration = parseInt(params.wa_msg_duration, 10);
+        }
+        
+        // Process optional event tag for message reply
+        if (params.event_source === '0' && params.event_value === '0') {
+            payload.reply_message_id = params.event_tag;
+        }
+        
+        // ############
+        // Send request
+        // ############
+        try {
+            response = request.post(gowa_url, JSON.stringify(payload));
+            response = JSON.parse(response);
+            http_status = request.getStatus();
+        
+            result = {
+                message: response.message,
+                tags: { wa_msg_id: response.results.message_id }
+            };
+        
+            if (http_status < 200 || http_status >= 300) {
+                throw new Error('HTTP code ' + http_status);
+            }
+        
+        } catch (error) {
+            result = {
+                Error: 'Exception during WhatsApp GOWA POST: ' + error.message,
+                GOWA_URL: gowa_url,
+                sent_payload: payload,
+                return_response: response
+            };
+        
+            Zabbix.log(4, '[ GOWA webhook ] Error - HTTP code: ' + http_status);
+            Zabbix.log(4, '[ GOWA webhook ] Error - Message: ' + error.message);
+            Zabbix.log(4, '[ GOWA webhook ] Error - GOWA Result: ' + JSON.stringify(result));
+        }
+        
+        return JSON.stringify(result);
+      process_tags: 'YES'
+      description: |
+        This is a simple media type that integrates Zabbix to WhatsApp GOWA gateway. It facilitates the transmission of WhatsApp notifications and alerts to particular users or groups via the GOWA REST API.
+        
+        This media type primarily focuses on trigger alerts and uses a webhook to communicate with the GOWA API. Only simple messages are sent when an event triggers an action. Additionally, when the an event is resolved, the recovery message replies to the previous problem message of the same event.
+        
+        By Diasdm
+        https://github.com/diasdmhub/Zabbix_Out_of_The_Box/tree/main/media/wa_gowa
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '⛔️ ```{TRIGGER.STATUS}``` ⛔️'
+          message: |
+            *{EVENT.NAME}*
+            
+            Problem start: ```{EVENT.DATE} - {EVENT.TIME}```
+            Host: *{HOST.NAME}*
+            Severity: _{EVENT.SEVERITY}_
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '✅ ```{TRIGGER.STATUS}``` ✅'
+          message: |
+            *{EVENT.RECOVERY.NAME}*
+            
+            Problem end: ```{EVENT.RECOVERY.DATE} - {EVENT.RECOVERY.TIME}```
+            Host: *{HOST.NAME}*
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        - event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        - event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
