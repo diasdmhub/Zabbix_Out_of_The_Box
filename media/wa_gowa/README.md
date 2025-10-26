@@ -78,20 +78,26 @@ This media type primarily focuses on trigger alerts and uses a webhook to commun
 4. Proceed to Zabbix and go to the `Alerts` > `Media types` menu.
 5. [Import the GOWA media type](#%EF%B8%8F-download).
 6. Open the WhatsApp GOWA media type configuration and set up its parameters according to your environment.
-    a. Set up the GOWA URL schema by filling in the `gowa_schema` parameter.
-    b. Set up the GOWA URL domain name by filling in the `gowa_domain` parameter.
-    c. Set up the GOWA URL port number by filling in the `gowa_port` parameter.
-    d. Set up the GOWA authentication username and password by filling in the `gowa_user` and `gowa_pass` parameters, respectively.
-    e. If the destination WhatsApp ID is a group, set the `to_group` parameter to `true`. Otherwise, leave it as `false`.
-    f. The `wa_msg_duration` parameter is set to **7 days** (_604800 seconds_) by default. If desired, set it to a different value of your choosing. Set it to `0` or leave it blank to remove the time limit.
-    g. If a HTTP proxy connection is required, set the proxy URL in the format of `[protocol://][username[:password]@]domain.name[:port]`. See the [HTTP agent proxy configuration][http_proxy].
+
+    - Set up the GOWA URL schema by filling in the `gowa_schema` parameter.
+    - Set up the GOWA URL domain name by filling in the `gowa_domain` parameter.
+    - Set up the GOWA URL port number by filling in the `gowa_port` parameter.
+    - Set up the GOWA authentication username and password by filling in the `gowa_user` and `gowa_pass` parameters, respectively.
+    - If the destination WhatsApp ID is a group, set the `to_group` parameter to `true`. Otherwise, leave it as `false`.
+    - The `wa_msg_duration` parameter is set to **7 days** (_604800 seconds_) by default. If desired, set it to a different value of your choosing. Set it to `0` or leave it blank to remove the time limit.
+    - If a HTTP proxy connection is required, set the proxy URL in the format of `[protocol://][username[:password]@]domain.name[:port]`. See the [HTTP agent proxy configuration][http_proxy].
+
     ![WhatsApp GOWA parameters](./image/wa_gowa_parameters.png)
+
 7. You can optionally further customize the WhatsApp messages in the `Media templates` tab.
 8. Make sure your media type is enabled.
 9. Go to the `Users` > `Users` menu option and [create or edit the destination user][user_config].
-    a. In the user's `Media` tab, add the WhatsApp GOWA media type.
-    b. Add the user or group ID to the `Send to` field.
+
+    - In the user's `Media` tab, add the WhatsApp GOWA media type.
+    - Add the user or group ID to the `Send to` field.
+
     ![User media configuration](./image/wa_gowa_user_media.png)
+
 10. After setting up the media type, you can [create actions][create_actions] using the `Send message` operation with the WhatsApp GOWA media type.
 
 <BR>
