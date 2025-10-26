@@ -15,7 +15,7 @@
 
 This is a simple media type that integrates Zabbix to [**WhatsApp GOWA**][wa_gowa] gateway. It facilitates the transmission of WhatsApp notifications and alerts to particular users or groups via the GOWA REST API. 
 
-This media type primarily focuses on trigger alerts and uses a webhook to communicate with the GOWA API. **Only simple messages** are sent when an event triggers an action. Additionally, when the an event is resolved, the recovery message replies to the previous problem message of the same event.
+This media type primarily focuses on trigger alerts and uses a webhook to communicate with the GOWA API. **Only simple messages** are sent when an event triggers an action. Additionally, when an event is resolved, the recovery message replies to the previous problem message of the same event.
 
 > _Pull requests are welcomed for further webhook development._
 
@@ -32,7 +32,7 @@ This media type primarily focuses on trigger alerts and uses a webhook to commun
 ---
 ### ➡️ [Download](./zabbix_whatsapp_gowa_media_v743.yaml)
 ---
-#### ➡️ [*How to import templates*][import_media]
+#### ➡️ [*How to import media types*][import_media]
 ---
 
 <BR>
@@ -76,7 +76,7 @@ This media type primarily focuses on trigger alerts and uses a webhook to commun
 2. In GOWA's interface, log in to the WhatsApp account that will send messages.
 3. Search for and take note of the user or group ID that will receive the messages. This data can be found in the "List Group" or "Chat List" options.
 4. Proceed to Zabbix and go to the `Alerts` > `Media types` menu.
-5. [Import the GOWA media type](#-download).
+5. [Import the GOWA media type](#%EF%B8%8F-download).
 6. Open the WhatsApp GOWA media type configuration and set up its parameters according to your environment.
     a. Set up the GOWA URL schema by filling in the `gowa_schema` parameter.
     b. Set up the GOWA URL domain name by filling in the `gowa_domain` parameter.
