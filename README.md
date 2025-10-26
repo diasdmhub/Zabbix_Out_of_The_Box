@@ -31,7 +31,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 
 <BR>
 
-### Templates
+### Media Types
 
 - [Whatsapp GOWA media](./media/wa_gowa/)
 
