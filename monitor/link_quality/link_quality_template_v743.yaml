@@ -96,7 +96,7 @@ zabbix_export:
               priority: HIGH
               description: |
                 The average of the last 2 link sums is 0
-                This means that all the target links have a latency of 0, which may indicates that the WAN link may be unavailable
+                This means that all the target links have a latency of 0, which indicates that the WAN link may be unavailable
                 
                 This supersedes the prototype triggers
                 

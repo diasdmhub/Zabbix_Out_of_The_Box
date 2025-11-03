@@ -85,7 +85,7 @@ A manual address list is configured for each host to obtain the ICMP destination
 
 | Name                              | Description |
 | :-------------------------------- | :---------- |
-| ICMP Link Latency Sum Unavailable | The average of the last 2 link sums is 0. This means that all the target links have a latency of 0, which may indicates that the WAN link may be unavailable. This supersedes the prototype triggers. If the hosts `{$ICMP.WAN.ALERT}` macro is set to `0`, this trigger is ignored. |
+| ICMP Link Latency Sum Unavailable | The average of the last 2 link sums is 0. This means that all the target links have a latency of 0, which indicates that the WAN link may be unavailable. This supersedes the prototype triggers. If the hosts `{$ICMP.WAN.ALERT}` macro is set to `0`, this trigger is ignored. |
 
 <BR>
 
