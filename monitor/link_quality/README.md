@@ -6,7 +6,7 @@
 <div align="right">
 
 [![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE)
-[![Version](https://img.shields.io/badge/Version-726-blue?logo=zotero&color=0aa8d2)](./link_quality_template_v726.yaml)
+[![Version](https://img.shields.io/badge/Version-743-blue?logo=zotero&color=0aa8d2)](./link_quality_template_v743.yaml)
 
 </div>
 
@@ -47,7 +47,7 @@ A manual address list is configured for each host to obtain the ICMP destination
 
 ---
 
-### ➡️ [Download](./link_quality_template_v722.yaml)
+### ➡️ [Download](./link_quality_template_v743.yaml)
 
 ---
 
@@ -66,6 +66,7 @@ A manual address list is configured for each host to obtain the ICMP destination
 | {$ICMP.LOSS.WARN}    | `25`          | ICMP packet loss percentage for warning threshold. Default of 4 packets sent gives a rounding rate of 25, 50, 75 or 100. |
 | {$ICMP.REPEAT.COUNT} | `4`           | Number of ICMP packets sent to the destination address. |
 | {$ICMP.TIMEOUT}      | `200`         | RTT timeout of each ICMP packet in miliseconds. |
+| {$ICMP.WAN.ALERT}    | `1`           | Control weather the WAN link is important or not. 1 to activate and 0 to deactivate. No WAN event will be triggered if this is 0. |
 
 > **The default values can be very conservative and sensitive, and it is recommended that you customize them for your own environment.**
 
@@ -73,9 +74,18 @@ A manual address list is configured for each host to obtain the ICMP destination
 
 ## ITEMS
 
-| Name               | Description |
-| :----------------- | :---------- |
-| ICMP Address List  | This item takes a comma-separated list of ICMP destination addresses and converts it to a JSON array. This array is used by the ICMP Address Discovery rule to dynamically create items. |
+| Name                  | Description |
+| :-------------------- | :---------- |
+| ICMP Address List     | This item takes a comma-separated list of ICMP destination addresses and converts it to a JSON array. This array is used by the ICMP Address Discovery rule to dynamically create items. |
+| ICMP Link Latency Sum | This item sums the most recent latency values of all target links. This sum is primarily used to determine the availability of the WAN link. |
+
+<BR>
+
+## TRIGGERS
+
+| Name                              | Description |
+| :-------------------------------- | :---------- |
+| ICMP Link Latency Sum Unavailable | The average of the last 2 link sums is 0. This means that all the target links have a latency of 0, which may indicates that the WAN link may be unavailable. This supersedes the prototype triggers. If the hosts `{$ICMP.WAN.ALERT}` macro is set to `0`, this trigger is ignored. |
 
 <BR>
 

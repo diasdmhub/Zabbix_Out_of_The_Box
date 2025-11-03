@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '7.2'
+  version: '7.4'
   template_groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -35,7 +35,7 @@ zabbix_export:
         - Microsoft - internetbeacon.msedge.net
       vendor:
         name: diasdm
-        version: 7.2-6
+        version: 7.4-3
       groups:
         - name: Templates/Modules
       items:
@@ -67,6 +67,43 @@ zabbix_export:
           tags:
             - tag: Address
               value: list
+        - uuid: 0b9e866b3f734e4a831d2911b4d148c3
+          name: 'ICMP Link Latency Sum'
+          type: CALCULATED
+          key: icmp.latency.sum
+          delay: 5m
+          history: 1d
+          value_type: FLOAT
+          trends: '0'
+          units: s
+          params: 'sum(last_foreach(//icmppingsec[*,*,50,,*]))'
+          description: |
+            This item sums the most recent latency values of all target links.
+            
+            This sum is primarily used to determine the availability of the WAN link.
+          tags:
+            - tag: Link
+              value: sum
+          triggers:
+            - uuid: 97a74e0d3391402a85ad7ce3c4395ea8
+              expression: |
+                avg(/Link Quality by Simple Check/icmp.latency.sum,#2)=0
+                and
+                {$ICMP.WAN.ALERT}=1
+              name: 'ICMP Link Latency Sum Unavailable'
+              event_name: 'ICMP Link Latency Sum Unavailable (WAN Down)'
+              opdata: 'Latency sum: {ITEM.LASTVALUE}'
+              priority: HIGH
+              description: |
+                The average of the last 2 link sums is 0
+                This means that all the target links have a latency of 0, which may indicates that the WAN link may be unavailable
+                
+                This supersedes the prototype triggers
+                
+                If the hosts WAN.LINK.ALERT macro is set to 0, this trigger is ignored
+              tags:
+                - tag: WAN
+                  value: unavailable
       discovery_rules:
         - uuid: 5ed4e6cf97d944e8afdefe7de0120240
           name: 'ICMP Address Discovery'
@@ -76,19 +113,19 @@ zabbix_export:
           description: |
             This LLD takes the master item JSON array of ICMP destination addresses and converts it to an LLD JSON array. This array is looped through to dynamically create host items for each address in the array.
             
-            Each address from the array is converted to the "{#ICMP.ADDRESS}" LLD macro.
+            Each address from the array is converted to the ICMP.ADDRESS LLD macro.
             
             This discovery is performed each time the master item is updated or when the execute now command is run. If the user macro is updated, it will reflect any changes.
           item_prototypes:
             - uuid: 8ea846d2f9254e0ebf1f2789223d0827
               name: 'ICMP Jitter from {#ICMP.ADDRESS}'
               type: CALCULATED
-              key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
               delay: 5m
               history: 1w
               value_type: FLOAT
               units: s
-              params: 'abs(change(//icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]))'
+              params: 'abs(change(//icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]))'
               description: 'ICMP response time variation from the destination address {#ICMP.ADDRESS} taking into account previous and latest value'
               tags:
                 - tag: ICMP
@@ -98,7 +135,7 @@ zabbix_export:
             - uuid: bc141ea8039d48a1bf80944d74389883
               name: 'ICMP Loss from {#ICMP.ADDRESS}'
               type: SIMPLE
-              key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
               delay: 5m
               history: 1w
               value_type: FLOAT
@@ -112,26 +149,26 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: a560611b6537485d8807cef082ef4a4d
                   expression: |
-                    min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)>={$ICMP.LOSS.WARN}
+                    min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#2)>={$ICMP.LOSS.WARN:"{#ICMP.ADDRESS}"}
                     or
-                    last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}])>{$ICMP.LOSS.WARN} * 2
+                    last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}])>{$ICMP.LOSS.WARN:"{#ICMP.ADDRESS}"} * 2
                   name: '{#ICMP.ADDRESS} High ICMP loss'
                   opdata: 'Loss: {ITEM.VALUE}'
                   priority: WARNING
                   description: |
-                    Last and previous ICMP ping attempts returned at least {$ICMP.LOSS.WARN}% of packet loss,
+                    Last and previous ICMP ping attempts returned at least the packet loss warn context macro in percent,
                     or
-                    The latest ICMP ping attempt returned more than {$ICMP.LOSS.WARN}% packet loss.
+                    The latest ICMP ping attempt returned more than the packet loss warn context macro in percent.
                   dependencies:
                     - name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
-                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#2)=0'
                   tags:
                     - tag: Loss
                       value: high
             - uuid: 644e0c27c6d6417aaefa95b8fb6a08f1
               name: 'ICMP Response Time from {#ICMP.ADDRESS}'
               type: SIMPLE
-              key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+              key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
               delay: 5m
               history: 1w
               value_type: FLOAT
@@ -144,29 +181,35 @@ zabbix_export:
                   value: '{#ICMP.ADDRESS}'
               trigger_prototypes:
                 - uuid: a9e3bae6f8294f419f3153049bba529b
-                  expression: 'last(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#1)>{$ICMP.LATENCY.WARN}'
+                  expression: 'last(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#1)>{$ICMP.LATENCY.WARN:"{#ICMP.ADDRESS}"}'
                   name: '{#ICMP.ADDRESS} High ICMP ping response time'
                   opdata: 'Latency: {ITEM.VALUE}'
                   priority: WARNING
-                  description: 'The last ICMP ping response time was higher than {$ICMP.LATENCY.WARN}s'
+                  description: 'The last ICMP ping response time was higher than the context latency warn macro in seconds'
                   dependencies:
                     - name: '{#ICMP.ADDRESS} High ICMP loss'
                       expression: |
-                        min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)>={$ICMP.LOSS.WARN}
+                        min(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#2)>={$ICMP.LOSS.WARN:"{#ICMP.ADDRESS}"}
                         or
-                        last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}])>{$ICMP.LOSS.WARN} * 2
+                        last(/Link Quality by Simple Check/icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}])>{$ICMP.LOSS.WARN:"{#ICMP.ADDRESS}"} * 2
                     - name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
-                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                      expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#2)=0'
                   tags:
                     - tag: Latency
                       value: high
                 - uuid: 20d64316c5d34fd2a1a08575566da1c7
-                  expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}],#2)=0'
+                  expression: 'max(/Link Quality by Simple Check/icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}],#2)=0'
                   name: '{#ICMP.ADDRESS} Unavailable by ICMP ping'
                   priority: HIGH
                   description: |
                     The last two ICMP ping attempts to {#ICMP.ADDRESS} have timed out
                     Check target connectivity
+                  dependencies:
+                    - name: 'ICMP Link Latency Sum Unavailable'
+                      expression: |
+                        avg(/Link Quality by Simple Check/icmp.latency.sum,#2)=0
+                        and
+                        {$ICMP.WAN.ALERT}=1
                   tags:
                     - tag: Latency
                       value: unavailable
@@ -181,7 +224,7 @@ zabbix_export:
                   calc_fnc: ALL
                   item:
                     host: 'Link Quality by Simple Check'
-                    key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+                    key: 'icmppingsec[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
                 - sortorder: '1'
                   drawtype: DASHED_LINE
                   color: F63100
@@ -189,14 +232,14 @@ zabbix_export:
                   calc_fnc: ALL
                   item:
                     host: 'Link Quality by Simple Check'
-                    key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+                    key: 'icmppingloss[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
                 - sortorder: '2'
                   drawtype: BOLD_LINE
                   color: 1976D2
                   calc_fnc: ALL
                   item:
                     host: 'Link Quality by Simple Check'
-                    key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT},50,,{$ICMP.TIMEOUT}]'
+                    key: 'icmppingjitter[{#ICMP.ADDRESS},{$ICMP.REPEAT.COUNT:"{#ICMP.ADDRESS}"},50,,{$ICMP.TIMEOUT:"{#ICMP.ADDRESS}"}]'
           master_item:
             key: icmp.address.list
           lld_macro_paths:
@@ -220,6 +263,9 @@ zabbix_export:
         - macro: '{$ICMP.TIMEOUT}'
           value: '200'
           description: 'RTT timeout of each ICMP packet in miliseconds.'
+        - macro: '{$ICMP.WAN.ALERT}'
+          value: '1'
+          description: 'Control weather the WAN link is important or not. 1 to activate and 0 to deactivate. No WAN event will be triggered if this is 0.'
       dashboards:
         - uuid: b44aa89b83bf45b4aec88b1786bd65e3
           name: 'Link Quality'
@@ -384,12 +430,24 @@ zabbix_export:
                     - type: STRING
                       name: tags.6.value
                       value: ''
+                    - type: INTEGER
+                      name: tags.7.operator
+                      value: '0'
+                    - type: STRING
+                      name: tags.7.tag
+                      value: WAN
+                    - type: STRING
+                      name: tags.7.value
+                      value: unavailable
                 - type: toptriggers
                   name: 'Top Triggers for the Selected Dashboard Period'
                   'y': '13'
                   width: '72'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: evaltype
+                      value: '2'
                     - type: INTEGER
                       name: tags.0.operator
                       value: '0'
@@ -453,6 +511,15 @@ zabbix_export:
                     - type: STRING
                       name: tags.6.value
                       value: ''
+                    - type: INTEGER
+                      name: tags.7.operator
+                      value: '0'
+                    - type: STRING
+                      name: tags.7.tag
+                      value: WAN
+                    - type: STRING
+                      name: tags.7.value
+                      value: unavailable
                 - type: topitems
                   name: 'Links Jitter'
                   x: '36'
