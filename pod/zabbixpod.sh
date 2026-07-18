@@ -5,7 +5,7 @@
 
 # CHANGE VARIABLES HERE IF REQUIRED
 ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
-ZBXMINORVER="0"            # ZABBIX MINOR VERSION
+ZBXMINORVER="4"            # ZABBIX MINOR VERSION
 DBROOTPASS="zabbix"        # DBMS ROOT PASSWORD
 DBNAME="zabbix"            # ZABBIX DATABASE PASSWORD
 DBUSER="zabbix"            # ZABBIX DATABASE USER
@@ -97,6 +97,7 @@ podman create \
     -e ZBX_WEBSERVICEURL=http://$ZBXSERVERNAME-web-service:10053/report \
     -e ZBX_WEBDRIVERURL=http://$ZBXSERVERNAME-selenium:4444 \
     -e ZBX_STARTBROWSERPOLLERS=4 \
+    -e ZBX_NODEADDRESS="${ZBXSERVERNAME}-server" \
     docker.io/zabbix/zabbix-server-mysql:"$ZBXTAG"
 
 # ZABBIX FRONTEND CONTAINER
@@ -114,10 +115,10 @@ podman create \
     -e MYSQL_DATABASE="$DBNAME" \
     -e MYSQL_USER="$DBUSER" \
     -e MYSQL_PASSWORD="$DBPASS" \
-    -e ZBX_SERVER_HOST="${ZBXSERVERNAME}-server" \
     -e ZBX_SERVER_NAME="${ZBXSERVERNAME}_Pod" \
     -e PHP_TZ="$TIMEZ" \
     -e EXPOSE_WEB_SERVER_INFO="on" \
+    -e ZBX_SERVER_HOST="${ZBXSERVERNAME}-server" \
     docker.io/zabbix/zabbix-web-nginx-mysql:"$ZBXTAG"
 
 # ZABBIX SNMPTRAPS CONTAINER
