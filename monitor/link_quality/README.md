@@ -43,8 +43,11 @@ A manual address list is configured for each host to obtain the ICMP destination
 > - Google - `connectivitycheck.gstatic.com`
 > - Cloudflare - `engage.cloudflareclient.com`
 > - Microsoft - `internetbeacon.msedge.net`
+> - [Cisco Meraki][ciscodoc] - `icmp.canireachthe.net`
+> - [Arch Linux][archdoc] - `ping.archlinux.org`
+> - [Ubuntu][ubuntudoc] - `connectivity-check.ubuntu.com`
 
-> 💡 _I'm looking for more BigTech **public** addresses that are specific for conectivity checks, like captive portal or beacon addresses (Amazon, Apple, banks, Cisco, Meta, Netflix, NVidia, Tesla, etc). If you know any, please report them in the issues tab._
+> 💡 _I'm looking for more BigTech **public** addresses that are specific for conectivity checks, like captive portal or beacon addresses (Amazon, Apple, banks, Meta, Netflix, NVidia, Tesla, etc). If you know any, please report them in the issues tab._
 
 <BR>
 
@@ -150,3 +153,7 @@ A manual address list is configured for each host to obtain the ICMP destination
 
 | [⬆️ Top](#link-quality-by-simple-check-zabbix-template) |
 | --- |
+
+[ciscodoc]: https://documentation.meraki.com/SASE_and_SD-WAN/MX/Design_and_Configure/Configuration_Guides/Firewall_and_Traffic_Shaping/Connection_Monitoring_for_WAN_Failover
+[archdoc]: https://wiki.archlinux.org/title/NetworkManager#Checking_connectivity
+[ubuntudoc]: https://documentation.ubuntu.com/core/explanation/system-snaps/network-manager/how-to-guides/configure-the-snap/connectivity-check/
