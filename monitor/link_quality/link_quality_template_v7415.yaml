@@ -40,7 +40,7 @@ zabbix_export:
         - Microsoft - internetbeacon.msedge.net
       vendor:
         name: diasdm
-        version: 7.4-5
+        version: 7.4-15
       groups:
         - name: Templates/Modules
       items:
