@@ -277,8 +277,6 @@ zabbix_export:
         - tag: Link
           value: quality
       macros:
-        - macro: '{$ICMP.ADDRESS.LIST}'
-          description: 'Comma-separated list of ICMP destination addresses. DNS names are valid if your Zabbix Server can resolve them.'
         - macro: '{$ICMP.LATENCY.WARN}'
           value: '0.15'
           description: 'ICMP RTT latency warning timeout in seconds'
