@@ -51,7 +51,7 @@ Tested with AMD and Intel hosts running Zabbix Agent 2.
 <BR>
 
 ---
-### ➡️ [Download (releases)][template_file]
+### ➡️ [Download][template_file]
 ---
 #### ➡️ [_How to import templates_][import_templates]
 ---
