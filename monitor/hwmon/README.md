@@ -1,3 +1,6 @@
+| [↩️ Back](../) |
+| --- |
+
 # Linux Hwmon Sensors Zabbix Template by Agent Active
 
 <div align="right">
@@ -138,6 +141,9 @@ Tested with AMD and Intel hosts running Zabbix Agent 2.
 | `{#DEVTYPE} {#DEVICE} {#SENSOR}` - Temperature is Above Warning Threshold  | Indicates that the sensor temperature has stayed above warning threshold for 5 minutes |
 
 <BR>
+
+| [⬆️ Top](#linux-hwmon-sensors-zabbix-template-by-agent-active) |
+| --- |
 
 [hwmon]: https://docs.kernel.org/hwmon/index.html
 [template_file]: ./linux_hwmon_template_v7415.yaml
