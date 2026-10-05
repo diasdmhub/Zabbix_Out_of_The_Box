@@ -1,0 +1,246 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: 846977d1dfed4968bc5f8bdb363285bc
+      name: 'Templates/Operating systems'
+  templates:
+    - uuid: 8b41fee85bb040e7bdebf85dac7f2041
+      template: 'Linux Hwmon Sensors by Zabbix Agent Active'
+      name: 'Linux Hwmon Sensors by Zabbix Agent Active'
+      description: |
+        Discovers Linux hwmon temperature sensors with an active Zabbix Agent
+        
+        The discovery scans /sys/devices with vfs.dir.get for temp*_input files and reads each sensor with vfs.file.contents.
+        It covers CPUs (AMD k10temp, Intel coretemp), GPUs, NVMe drives, DDR5 modules, network adapters and Super I/O chips.
+        
+        Item keys contain the hwmonN directory. If the kernel renumbers hwmon devices after a reboot, new items may be created and the old ones are removed after the lost resources period.
+        
+        By Diasdm
+        https://github.com/diasdmhub/Linux_Hwmon_Zabbix_Template
+      vendor:
+        name: diasdm
+        version: 7.4-15
+      groups:
+        - name: 'Templates/Operating systems'
+      discovery_rules:
+        - uuid: a7e16241bc8647d489d21c0d8e259ea3
+          name: 'Discovery Hwmon Temperature'
+          type: ZABBIX_ACTIVE
+          key: 'vfs.dir.get[/sys/devices,"{$HWMON.TEMP.INPUT.FILE}",,file]'
+          delay: 5m
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#DEVICE}'
+                value: '{$HWMON.DEVICE.MATCHES}'
+              - macro: '{#DEVICE}'
+                value: '{$HWMON.DEVICE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#DEVTYPE}'
+                value: '{$HWMON.DEVTYPE.MATCHES}'
+              - macro: '{#DEVTYPE}'
+                value: '{$HWMON.DEVTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          lifetime: 5d
+          description: |
+            Discovers hwmon temperature sensors
+            
+            Every temp*_input file below /sys/devices becomes one sensor. The JavaScript preprocessing classifies each sensor by device type and device name
+          item_prototypes:
+            - uuid: 7fe3dfb749014afa9c83caf530af75ab
+              name: '{#DEVTYPE} {#DEVICE} - Device Name'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.file.contents["{#HWMONDIR}/name"]'
+              delay: 1h
+              history: 7d
+              value_type: CHAR
+              description: |
+                The hwmon driver name of the {#DEVTYPE} device {#DEVICE}. For example k10temp, coretemp, amdgpu, nvme or spd5118
+                
+                Source: {#HWMONDIR}/name
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                - tag: Device
+                  value: name
+                - tag: '{#DEVICE}'
+                  value: '{#SENSOR}'
+            - uuid: 4b11d3c1a6f8476990e4d46cf0a2a3f1
+              name: '{#DEVTYPE} {#DEVICE} {#SENSOR} - Temperature'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.file.contents["{#PATH}"]'
+              history: 30d
+              value_type: FLOAT
+              units: °C
+              description: |
+                The temperature reading of the hwmon sensor {#SENSOR} on the {#DEVTYPE} device {#DEVICE}
+                
+                The kernel reports millidegrees Celsius, converted to degrees Celsius
+                
+                Source: {#PATH}
+              preprocessing:
+                - type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              tags:
+                - tag: Device
+                  value: temp
+                - tag: '{#DEVICE}'
+                  value: '{#SENSOR}'
+              trigger_prototypes:
+                - uuid: 1a9d4bbeaa384e7ebaa401ab07fad8c5
+                  expression: 'min(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)>{$HWMON.TEMP.CRIT:"{#DEVTYPE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)<{$HWMON.TEMP.CRIT:"{#DEVTYPE}"}-3'
+                  name: '{#DEVTYPE} {#DEVICE} {#SENSOR} - Temperature is Above Critical Threshold'
+                  opdata: 'Current temp: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: |
+                    Indicates that the sensor temperature has stayed above critical threshold for 5 minutes
+                    
+                    The trigger resolves the event when the temperature stays 3 degrees below the threshold for 5 minutes
+                  tags:
+                    - tag: Temp
+                      value: critical
+                - uuid: ac2778b3fb7443398632bc1aa40c83fe
+                  expression: 'min(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)>{$HWMON.TEMP.WARN:"{#DEVTYPE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)<{$HWMON.TEMP.WARN:"{#DEVTYPE}"}-3'
+                  name: '{#DEVTYPE} {#DEVICE} {#SENSOR} - Temperature is Above Warning Threshold'
+                  opdata: 'Current temp: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: |
+                    Indicates that the sensor temperature has stayed above warning threshold for 5 minutes
+                    
+                    The trigger resolves the event when the temperature stays 3 degrees below the threshold for 5 minutes
+                  dependencies:
+                    - name: '{#DEVTYPE} {#DEVICE} {#SENSOR} - Temperature is Above Critical Threshold'
+                      expression: 'min(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)>{$HWMON.TEMP.CRIT:"{#DEVTYPE}"}'
+                      recovery_expression: 'max(/Linux Hwmon Sensors by Zabbix Agent Active/vfs.file.contents["{#PATH}"],5m)<{$HWMON.TEMP.CRIT:"{#DEVTYPE}"}-3'
+                  tags:
+                    - tag: Temp
+                      value: high
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Linux hwmon temperature sensors discovery
+                  //
+                  // Input:  vfs.dir.get[/sys/devices,"^temp\d+_input$",,file]
+                  // Output: one LLD row per hwmon temperature sensor (temp*_input file)
+                  //
+                  // Device types ({#DEVTYPE}), checked in this order:
+                  //
+                  //   Type      Device                                   Path example (below /sys/devices)          {#DEVICE}
+                  //   nvme      NVMe drive                               .../nvme/nvme0/hwmon3                      nvme0
+                  //   i2c       I2C device, such as a DDR5 SPD hub       .../i2c-0/0-0050/hwmon/hwmon5              i2c-0-50
+                  //   thermal   ACPI (acpitz) or device thermal zone     virtual/thermal/thermal_zone0/hwmon0       thermal_zone0
+                  //   wmi       ACPI WMI firmware device, such as        .../wmi_bus-PNP0C14:06/F1DDEE52-.../hwmon3 wmi-F1DDEE52
+                  //             dell_smm, dell_ddv or asus_wmi_sensors
+                  //   cpu       Intel CPU (coretemp)                     platform/coretemp.0/hwmon/hwmon3           coretemp.0
+                  //   platform  Platform device, such as Super I/O       platform/nct6775.656/hwmon/hwmon5          nct6775.656
+                  //   cpu       AMD CPU (k10temp, PCI 00:18.3)           pci0000:00/0000:00:18.3/hwmon/hwmon4       00:18.3
+                  //   mdio      Network PHY on an MDIO bus (r8169)       .../0000:02:00.0/mdio_bus/.../hwmon1       02:00.0
+                  //   pci       Other PCI device, such as amdgpu or i915 .../0000:c5:00.0/hwmon/hwmon8              c5:00.0
+                  //   other     Anything else                            any                                        last path component
+                  //
+                  // The thermal type is filtered out by default, because acpitz is often a fixed value and
+                  // device zones such as iwlwifi can be unreadable.
+                  //
+                  // WMI devices are named after the first block of their WMI GUID, which is fixed by the firmware.
+                  // The PNP0C14:NN instance number is not used, because it depends on the ACPI enumeration order.
+                  //
+                  // Macros: {#PATH} temp*_input file, {#HWMONDIR} its hwmon directory, {#SENSOR} temp1..tempN,
+                  // {#DEVTYPE} and {#DEVICE} as above, {#CHIPITEM} "yes" only for the first sensor of each hwmon
+                  // directory (used by an LLD override so the chip name item is created once per chip).
+                  var files = JSON.parse(value), out = [], seen = {};
+                  for (var i = 0; i < files.length; i++) {
+                      var p = files[i].pathname;
+                      var m = p.match(/^(.*?)\/(?:hwmon\/)?(hwmon\d+)\/(temp\d+)_input$/);
+                      if (!m) continue;
+                      var devpath = m[1], hwmondir = p.substr(0, p.lastIndexOf('/'));
+                      var type = 'other', dev = devpath.substr(devpath.lastIndexOf('/') + 1), addr = '';
+                      var pcis = devpath.match(/[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]/g);
+                      var i2c = devpath.match(/\/i2c-(\d+)\/\d+-([0-9a-f]{4})$/);
+                      var nvme = devpath.match(/\/nvme\/(nvme\d+)$/);
+                      var tz = devpath.match(/\/thermal\/(thermal_zone\d+)$/);
+                      var plat = devpath.match(/\/platform\/([^\/]+)$/);
+                      var wmi = devpath.match(/\/wmi_bus-[^\/]+\/([0-9A-Fa-f]{8})-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/);
+                      // Last PCI address in the path, without the PCI domain (0000:c5:00.0 -> c5:00.0)
+                      if (pcis) addr = pcis[pcis.length - 1].substr(5);
+                      if (nvme) { type = 'nvme'; dev = nvme[1]; }
+                      else if (i2c) { type = 'i2c'; dev = 'i2c-' + i2c[1] + '-' + i2c[2].replace(/^0+(?=.)/, ''); }
+                      else if (tz) { type = 'thermal'; dev = tz[1]; }
+                      else if (wmi) { type = 'wmi'; dev = 'wmi-' + wmi[1].toUpperCase(); }
+                      else if (plat) { type = /^coretemp\./.test(plat[1]) ? 'cpu' : 'platform'; dev = plat[1]; }
+                      else if (/\/0000:00:18\.3$/.test(devpath)) { type = 'cpu'; dev = addr; }
+                      else if (/mdio_bus/.test(devpath)) { type = 'mdio'; dev = addr || dev; }
+                      else if (addr) { type = 'pci'; dev = addr; }
+                      out.push({
+                          '{#PATH}': p,
+                          '{#HWMONDIR}': hwmondir,
+                          '{#SENSOR}': m[3],
+                          '{#DEVTYPE}': type,
+                          '{#DEVICE}': dev,
+                          '{#CHIPITEM}': seen[hwmondir] ? 'no' : 'yes'
+                      });
+                      seen[hwmondir] = true;
+                  }
+                  return JSON.stringify(out);
+          overrides:
+            - name: 'Device Name once per hwmon device'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#CHIPITEM}'
+                    value: ^yes$
+                    operator: NOT_MATCHES_REGEX
+              operations:
+                - operator: LIKE
+                  value: 'Device Name'
+                  discover: NO_DISCOVER
+      tags:
+        - tag: Linux
+          value: sensor
+      macros:
+        - macro: '{$HWMON.DEVICE.MATCHES}'
+          value: '.*'
+          description: 'Filters only devices that match this regex. For example 00:18.3, nvme0, i2c-0-50 or coretemp.0'
+        - macro: '{$HWMON.DEVICE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filters out devices that match this regex'
+        - macro: '{$HWMON.DEVTYPE.MATCHES}'
+          value: '.*'
+          description: 'Filters only device types that match this regex. Types: cpu, nvme, i2c, pci, mdio, platform, wmi, thermal, other'
+        - macro: '{$HWMON.DEVTYPE.NOT_MATCHES}'
+          value: ^thermal$
+          description: 'Filters out device types that match this regex. Thermal zones are filtered out by default because ACPI zones are often fake and device zones can be unreadable'
+        - macro: '{$HWMON.TEMP.CRIT}'
+          value: '90'
+          description: 'Critical temperature threshold in degrees Celsius. Can be used with the device type as context'
+        - macro: '{$HWMON.TEMP.CRIT:"cpu"}'
+          value: '95'
+          description: 'Critical temperature threshold for CPUs (AMD -k10temp Tctl, Intel - coretemp)'
+        - macro: '{$HWMON.TEMP.CRIT:"i2c"}'
+          value: '85'
+          description: 'Critical temperature threshold for I2C sensors, such as DDR5 SPD hubs'
+        - macro: '{$HWMON.TEMP.CRIT:"nvme"}'
+          value: '80'
+          description: 'Critical temperature threshold for NVMe drives'
+        - macro: '{$HWMON.TEMP.INPUT.FILE}'
+          value: ^temp\d+_input$
+          description: 'Regex to filter only files that provide temperature values'
+        - macro: '{$HWMON.TEMP.WARN}'
+          value: '80'
+          description: 'Warning temperature threshold in degrees Celsius. Can be used with the device type as context'
+        - macro: '{$HWMON.TEMP.WARN:"cpu"}'
+          value: '85'
+          description: 'Warning temperature threshold for CPUs (AMD k10temp Tctl, Intel coretemp)'
+        - macro: '{$HWMON.TEMP.WARN:"i2c"}'
+          value: '75'
+          description: 'Warning temperature threshold for I2C sensors, such as DDR5 SPD hubs'
+        - macro: '{$HWMON.TEMP.WARN:"nvme"}'
+          value: '70'
+          description: 'Warning temperature threshold for NVMe drives'
