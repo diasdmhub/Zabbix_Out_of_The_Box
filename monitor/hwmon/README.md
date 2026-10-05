@@ -118,7 +118,7 @@ Tested with AMD and Intel hosts running Zabbix Agent 2.
 
 <BR>
 
-### ➡️ DISCOVERY RULE `Discovery Hwmon Temperature`
+### DISCOVERY RULE `Discovery Hwmon Temperature`
 
 > **Discovers hwmon temperature sensors below `/sys/devices`**
 
