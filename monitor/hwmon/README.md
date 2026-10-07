@@ -16,9 +16,9 @@
 
 Linux exposes hardware sensors through the kernel's [**hwmon**][hwmon] subsystem. Each sensor driver registers its readings under `/sys/devices` as `temp*_input` files. Examples of sensor drivers include `k10temp` for AMD CPUs, `coretemp` for Intel CPUs, `amdgpu`, `nvme` or `spd5118` for DDR5 modules.
 
-Many monitoring setups read CPU temperatures from `/sys/devices/virtual/thermal/thermal_zone*/temp`. This method works on most Intel hosts, where the `x86_pkg_temp` thermal zone exists. However, on AMD hosts, however, the CPU driver only registers an hwmon device, not thermal zone. The remaining zones typically originate from the BIOS ACPI tables (`acpitz`), which often report a fixed value, or from devices, such as Wi-Fi cards, that may be unreadable.
+Many monitoring setups read CPU temperatures from `/sys/devices/virtual/thermal/thermal_zone*/temp`. This method works on most Intel hosts, where the `x86_pkg_temp` thermal zone exists. However, on AMD hosts the CPU driver only registers an hwmon device, not thermal zone. The remaining zones typically originate from the BIOS ACPI tables (`acpitz`), which often report a fixed value, or devices that may be unreadable, such as Wi-Fi cards.
 
-This template discovers every hwmon temperature sensor on a Linux host using only native Zabbix Agent keys. No `UserParameter`, sudo rule, or `lm-sensors` package is required. As devices change, the monitoring updates automatically.
+This template discovers every hwmon temperature sensor on a Linux host using only native Zabbix Agent keys. No `UserParameter`, `sudo`, or `lm-sensors` package is required. As devices change, the monitoring updates automatically.
 
 <BR>
 
