@@ -331,7 +331,7 @@ zabbix_export:
                   name: 'Housekeeper Records Deleted'
                   'y': '2'
                   width: '36'
-                  height: '7'
+                  height: '8'
                   fields:
                     - type: INTEGER
                       name: ds.0.axisy
@@ -359,7 +359,7 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: legend_lines
-                      value: '2'
+                      value: '10'
                     - type: INTEGER
                       name: legend_lines_mode
                       value: '1'
@@ -590,7 +590,7 @@ zabbix_export:
                   x: '36'
                   'y': '2'
                   width: '36'
-                  height: '7'
+                  height: '8'
                   fields:
                     - type: INTEGER
                       name: ds.0.axisy
