@@ -5,7 +5,7 @@
 
 <div align="right">
 
-[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-722-blue?logo=zotero&color=0aa8d2)](./zabbix_housekeeper_template_v722.yaml)
+[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-722-blue?logo=zotero&color=0aa8d2)](./zabbix_housekeeper_template_v7415.yaml)
 
 </div>
 
@@ -46,7 +46,7 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 | Name |
 | :--- |
 | Housekeeper Log Statistics |
-| Housekeeper Log Statistics: Alarm Records Deleted |
+| Housekeeper Log Statistics: Service Alarm Records Deleted |
 | Housekeeper Log Statistics: Audit Records Deleted |
 | Housekeeper Log Statistics: Autoregistration Host Records Deleted |
 | Housekeeper Log Statistics: Event Records Deleted |
@@ -56,6 +56,7 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 | Housekeeper Log Statistics: Problem Records Deleted |
 | Housekeeper Log Statistics: Records Deleted |
 | Housekeeper Log Statistics: Session Records Deleted |
+| Housekeeper Log Statistics: Sets Deleted |
 
 <BR>
 

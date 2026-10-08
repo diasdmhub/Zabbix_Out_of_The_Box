@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '7.2'
+  version: '7.4'
   template_groups:
-    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+    - uuid: 26b0b8ed7f8c4a0e9c7c2a0c9d6c5a11
       name: Templates/Applications
   templates:
     - uuid: 39cc630e39f241deacd1579c72aa882f
@@ -14,7 +14,7 @@ zabbix_export:
         https://github.com/diasdmhub/Zabbix_Out_of_The_Box/
       vendor:
         name: diasdm
-        version: 7.2-2
+        version: 7.4-15
       groups:
         - name: Templates/Applications
       items:
@@ -31,11 +31,11 @@ zabbix_export:
             - tag: Log
               value: Housekeeper
         - uuid: 687ca83601274c9283136cd23c1c3563
-          name: 'Alarm Records Deleted'
+          name: 'Service Alarm Records Deleted'
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[alarms]'
           history: 30d
-          description: 'Number of alarm records deleted on the last run of the Zabbix Housekeeper process'
+          description: 'Number of rows deleted from the service_alarms table (SLA and service status history)'
           preprocessing:
             - type: REGEX
               parameters:
@@ -51,7 +51,7 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[audit]'
           history: 30d
-          description: 'Number of audit records deleted on the last run of the Zabbix Housekeeper process'
+          description: 'Number of deleted audit log rows that are older than the configured audit log settings'
           preprocessing:
             - type: REGEX
               parameters:
@@ -67,7 +67,7 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[autoreg_host]'
           history: 30d
-          description: 'Number of autoregistration host records deleted on the last execution of the Zabbix Housekeeper process'
+          description: 'Number of deleted autoregistration host entries for hosts that no longer exist and for which no autoregistration event exists'
           preprocessing:
             - type: REGEX
               parameters:
@@ -83,7 +83,11 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[events]'
           history: 30d
-          description: 'Number of event records deleted on the last execution of the Zabbix Housekeeper process'
+          description: |
+            Number of old events deleted from each source (trigger, internal, discovery, autoregistration, service).
+            
+            Events that are still referenced by an open problem, recovery or a symptom are kept.
+            Rows that depend on these events, such as alerts and acknowledgments, are removed by database cascade and are not counted here.
           preprocessing:
             - type: REGEX
               parameters:
@@ -99,7 +103,10 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[history]'
           history: 30d
-          description: 'Number of history and trend records deleted on the last execution of the Zabbix Housekeeper process'
+          description: |
+            Number of deleted rows in the history and trends tables older than each items storage period, or the global override
+            
+            If TimescaleDB partition dropping is in use, the history and trends are removed by dropping chunks, and those deletions are not reflected as row counts in hist/trends
           preprocessing:
             - type: REGEX
               parameters:
@@ -117,7 +124,10 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[items]'
           history: 30d
-          description: 'Number of item and trigger records deleted on the last execution of the Zabbix Housekeeper process'
+          description: |
+            Number of deleted history, trends and internal problems left over from deleted items, triggers, LLD rules and services
+            
+            The frontend queues this work in the housekeeper table, which is then processed in the next cycle
           preprocessing:
             - type: REGEX
               parameters:
@@ -135,7 +145,7 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[problems]'
           history: 30d
-          description: 'Number of problem records deleted on the last execution of the Zabbix Housekeeper process'
+          description: 'Number of deleted resolved problems whose recovery time is more than 24 hours old and that are not the cause of another problem'
           preprocessing:
             - type: REGEX
               parameters:
@@ -151,11 +161,21 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[records]'
           history: 30d
-          description: 'Number of records deleted on the last execution of the Zabbix Housekeeper process'
+          description: |
+            Number of deleted old network discovery results received from proxies.
+            
+            proxy_dhistory is a temporary table that holds hosts and services found by discovery rules that are waiting to be processed.
+            It should normally be close to empty on the server.
+            Housekeeper deletes any row older than 24 hours.
+            The retention is fixed in the code and has no frontend setting.
+            In practice, the value is almost always 0.
+            A non-zero value means that stale discovery data was piling up.
+            
+            src/zabbix_server/housekeeper/housekeeper_server.c
           preprocessing:
             - type: REGEX
               parameters:
-                - '(\d+) records in'
+                - '(\d+) records,'
                 - \1
           master_item:
             key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
@@ -167,7 +187,7 @@ zabbix_export:
           type: DEPENDENT
           key: 'zabbix.housekeeper.del[sessions]'
           history: 30d
-          description: 'Number of session records deleted on the last execution of the Zabbix Housekeeper process'
+          description: 'Number of deleted Frontend and API sessions whose last access is older than the configured period'
           preprocessing:
             - type: REGEX
               parameters:
@@ -178,6 +198,40 @@ zabbix_export:
           tags:
             - tag: Housekeeper
               value: Sessions
+        - uuid: c1fbc74c30ea4c5b8752c5c7f2a52da0
+          name: 'Sets Deleted'
+          type: DEPENDENT
+          key: 'zabbix.housekeeper.del[sets]'
+          history: 30d
+          description: |
+            Number of deleted orphaned permission sets.
+            
+            Zabbix does not store user-group-to-host-group permissions pair by pair.
+            Instead it groups them into "sets":
+            - ugset: a unique combination of user groups. Users are linked to it through user_ugset.
+            - hgset: a unique combination of host groups. Hosts are linked to it through host_hgset.
+            - permission: the access level that one ugset has on one hgset.
+            
+            When users or hosts change groups, some sets end up with no user or host linked to them.
+            
+            In one transaction, Housekeeper deletes the following:
+            1. permission rows whose ugset or hgset is no longer used;
+            2. ugset_group and ugset rows that no user references;
+            3. hgset_group and hgset rows that no host references.
+            
+            This step runs at most once a week, counted from when the housekeeper process started.
+            It is skipped in every other run and reports 0, which is expected most of the time.
+            You should only see an occasional non-zero spike.
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '(\d+) sets in'
+                - \1
+          master_item:
+            key: 'log["/var/log/zabbix/zabbix_server.log","housekeeper\s\[(.*)\]$",,,skip,"\1"]'
+          tags:
+            - tag: Housekeeper
+              value: sets
         - uuid: d3b5d96d538c45bd813f01ed9297ed81
           name: 'Execution Time'
           type: DEPENDENT
@@ -279,6 +333,9 @@ zabbix_export:
                   width: '36'
                   height: '7'
                   fields:
+                    - type: INTEGER
+                      name: ds.0.axisy
+                      value: '1'
                     - type: STRING
                       name: ds.0.color
                       value: FF465C
@@ -288,12 +345,18 @@ zabbix_export:
                     - type: STRING
                       name: ds.0.items.0
                       value: '* Records Deleted'
+                    - type: STRING
+                      name: ds.0.items.1
+                      value: 'Sets Deleted'
                     - type: INTEGER
                       name: ds.0.transparency
                       value: '1'
                     - type: INTEGER
                       name: ds.0.width
                       value: '3'
+                    - type: INTEGER
+                      name: lefty
+                      value: '0'
                     - type: INTEGER
                       name: legend_lines
                       value: '2'
@@ -334,11 +397,11 @@ zabbix_export:
                       name: or.1.items.5
                       value: 'Problem Records Deleted'
                     - type: STRING
+                      name: or.1.items.6
+                      value: 'Sets Deleted'
+                    - type: STRING
                       name: reference
                       value: HFAVX
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
                     - type: INTEGER
                       name: severities.0
                       value: '2'
@@ -355,7 +418,7 @@ zabbix_export:
                       name: show_problems
                       value: '1'
                 - type: item
-                  name: 'History and Trend Records Deleted'
+                  name: 'Item and Trigger Records Deleted'
                   x: '12'
                   width: '12'
                   hide_header: 'YES'
@@ -411,7 +474,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: item
-                  name: 'History and Trend Records Deleted'
+                  name: 'Event Records Records Deleted'
                   x: '24'
                   width: '12'
                   hide_header: 'YES'
@@ -467,7 +530,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: item
-                  name: 'History and Trend Records Deleted'
+                  name: 'Problem Records Deleted'
                   x: '36'
                   width: '12'
                   hide_header: 'YES'
@@ -529,6 +592,9 @@ zabbix_export:
                   width: '36'
                   height: '7'
                   fields:
+                    - type: INTEGER
+                      name: ds.0.axisy
+                      value: '1'
                     - type: STRING
                       name: ds.0.color
                       value: 689F38
@@ -550,6 +616,9 @@ zabbix_export:
                     - type: STRING
                       name: ds.1.aggregate_interval
                       value: 1d
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
                     - type: STRING
                       name: ds.1.color
                       value: FFD54F
@@ -572,6 +641,9 @@ zabbix_export:
                       name: ds.1.width
                       value: '3'
                     - type: INTEGER
+                      name: lefty
+                      value: '0'
+                    - type: INTEGER
                       name: legend_aggregation
                       value: '1'
                     - type: INTEGER
@@ -583,9 +655,6 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: UWBUD
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
                     - type: INTEGER
                       name: severities.0
                       value: '2'
@@ -602,7 +671,7 @@ zabbix_export:
                       name: show_problems
                       value: '1'
                 - type: item
-                  name: 'History and Trend Records Deleted'
+                  name: 'Alarm Records Deleted'
                   x: '48'
                   width: '12'
                   hide_header: 'YES'
@@ -658,7 +727,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: item
-                  name: 'History and Trend Records Deleted'
+                  name: 'Audit Records Deleted'
                   x: '60'
                   width: '12'
                   hide_header: 'YES'
