@@ -101,7 +101,9 @@ zabbix[version]pod/
 
 **4.** Following the Pod, a MySQL container is created. It is **not** bound to a routable network accessible from outside the Pod. Its credentials are set in the first variable set.
 
-> ⚠️ When creating or upgrading the Zabbix database with a major version, MySQL requires the `log_bin_trust_function_creators` variable to be set to `1`; otherwise, the upgrade fails with an error such as _`You do not have the SUPER privilege and binary logging is enabled`_. To handle this, the script writes a temporary option file (`mysql/conf/zbx_db_upgrade.cnf`) before the Pod starts, so MySQL loads `log_bin_trust_function_creators=1` at startup. This file is removed, and the variable is set back to `0`, after the database is ready (_see step **6**_).
+> ⚠️ When creating or upgrading the Zabbix database with a major version, MySQL requires the `log_bin_trust_function_creators` variable to be set to `1`; otherwise, the upgrade fails with an error such as _`You do not have the SUPER privilege and binary logging is enabled`_. \
+To handle this, the script writes a temporary option file (`mysql/conf/zbx_db_upgrade.cnf`) before the Pod starts, so MySQL loads `log_bin_trust_function_creators=1` at startup. \
+This file is removed, and the variable is set back to `0`, after the database is ready (_see step **6**_).
 
 **5.** Next, Zabbix component containers are created, all bound to the `localhost` address of the Pod as a shared network namespace. Also, a web driver container is created for Zabbix browser items. The containers are:
 
@@ -242,7 +244,7 @@ d47eaea66a13  docker.io/zabbix/zabbix-agent2:ol-trunk           /usr/sbin/zabbix
 In this test, the Zabbix Frontend is accessible at `http://192.168.8.197:8080`. \
 The default user and password are `Admin` and `zabbix` respectively.
 
-\* You can also create multiple pods for different versions of Zabbix on the same host. Note, however, that each pod should use a different set of bound ports. These should be configured in the script variable set.
+> _You can also create multiple pods for different versions of Zabbix on the same host. Note, however, that each pod should use a different set of bound ports. These should be configured in the script variable set._
 
 <BR>
 
