@@ -1,17 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # SCRIPT TO CREATE A POD AND ZABBIX CONTAINERS
 # by diasdm
 
 
 # CHANGE VARIABLES HERE IF REQUIRED
-ZBXMAJORVER="7"            # ZABBIX MAJOR VERSION
-ZBXMINORVER="4"            # ZABBIX MINOR VERSION
+ZBXMAJORVER="8"            # ZABBIX MAJOR VERSION
+ZBXMINORVER="0"            # ZABBIX MINOR VERSION
 DBROOTPASS="zabbix"        # DBMS ROOT PASSWORD
-DBNAME="zabbix"            # ZABBIX DATABASE PASSWORD
+DBNAME="zabbix"            # ZABBIX DATABASE NAME
 DBUSER="zabbix"            # ZABBIX DATABASE USER
 DBPASS="zabbix"            # ZABBIX DATABASE PASSWORD
 PORTWEB="8080"             # ZABBIX FRONTEND WEB PORT
 PORTSNMP="1162"            # SNMP TRAP PORT
+PORTMCP="8443"             # ZABBIX MCP SERVER PORT (ZABBIX 8.0+)
+MCPALLOWEDIP="127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"    # MCP CLIENTS ALLOWED (ZABBIX 8.0+)
 OSTAG="ol"                 # OS BASE IMAGE TAG
 
 
@@ -24,6 +26,18 @@ TIMEZ="$(timedatectl show --value -p Timezone)"    # LOCAL TIMEZONE IN PHP FORMA
 DBTAG="lts"
 SELENIUMTAG="latest"
 AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
+MCPMINMAJORVER="8"         # FIRST ZABBIX MAJOR VERSION WITH THE MCP SERVER
+DBUPGRADECNF="$HOME/$PODNAME/mysql/conf/zbx_db_upgrade.cnf"    # TEMPORARY MYSQL OPTIONS FOR DB CREATION/UPGRADE
+DBUPGRADETIMEOUT="1800"    # MAX SECONDS TO WAIT FOR THE DB CREATION/UPGRADE
+
+# ZABBIX MCP SERVER IS ONLY AVAILABLE FROM ZABBIX 8.0 ONWARDS
+if [ "$ZBXMAJORVER" -ge "$MCPMINMAJORVER" ]; then
+    ZBXMCP="true"
+    PODMCPPORT=(-p "$PORTMCP":8443)
+else
+    ZBXMCP="false"
+    PODMCPPORT=()
+fi
 
 
 # VOLUME DIRECTORIES SET
@@ -37,6 +51,11 @@ AUTOUPDATEREG="docker.io/library/io.containers.autoupdate=registry"
     mkdir -p "$HOME/$PODNAME/server/externalscripts" ; \
     mkdir -p "$HOME/$PODNAME/server/snmptraps"
 
+# ALLOWS ZABBIX TO CREATE TRIGGERS WHILE BINARY LOGGING IS ENABLED (DB CREATION/UPGRADE ONLY)
+# Removed by the "DATABASE UPGRADE SET" step once Zabbix Server has started
+printf "[mysqld]\nlog_bin_trust_function_creators=1\n" > "$DBUPGRADECNF" || { printf "\nFailed to create \"%s\"\n" "$DBUPGRADECNF" ; exit 1; }
+chmod 644 "$DBUPGRADECNF"
+
 
 # POD CREATION
 printf "\n%s POD CREATION\n" "$PODNAME"
@@ -47,6 +66,7 @@ podman pod create \
     -p "$PORTWEB":8080 \
     -p "$PORTSNMP":162/udp \
     -p 10051:10051 \
+    "${PODMCPPORT[@]}" \
     -v "$HOME/$PODNAME"/mysql/data:/var/lib/mysql:z \
     -v "$HOME/$PODNAME"/mysql/conf:/etc/mysql/conf.d:z \
     -v "$HOME/$PODNAME"/agent:/etc/zabbix/zabbix_agentd.d:z \
@@ -184,6 +204,22 @@ podman create \
     -e SE_BROWSER_LEFTOVERS_TEMPFILES_DAYS=2 \
     docker.io/selenium/standalone-chrome:"$SELENIUMTAG"
 
+# ZABBIX MCP SERVER CONTAINER - Only for Zabbix 8.0+
+if [ "$ZBXMCP" = "true" ]; then
+    printf "\n%s-mcp-server CONTAINER CREATION\n" "$ZBXSERVERNAME"
+
+    podman create \
+        --name $ZBXSERVERNAME-mcp-server \
+        --stop-signal SIGHUP \
+        --pod "$PODNAME" \
+        --tz=local \
+        --init \
+        --label "$AUTOUPDATEREG" \
+        -e ZBX_FRONTEND_URL="http://$ZBXSERVERNAME-web-nginx-mysql:8080/api_jsonrpc.php" \
+        -e ZBX_ALLOWEDIP="$MCPALLOWEDIP" \
+        docker.io/zabbix/zabbix-mcp-server:"$ZBXTAG"
+fi
+
 
 ## SYSTEMD SET ##
 printf "\nSYSTEMD \"%s.service\" SERVICE CREATION\n" "$PODNAME"
@@ -226,5 +262,38 @@ systemctl $SYSD_U_PARM daemon-reload
 systemctl $SYSD_U_PARM enable "$PODNAME.service"
 systemctl $SYSD_U_PARM start "$PODNAME.service"
 systemctl $SYSD_U_PARM --no-pager status "$PODNAME.service"
+
+
+## DATABASE UPGRADE SET ##
+printf "\nWAITING FOR THE ZABBIX DATABASE CREATION/UPGRADE (UP TO %s SECONDS)\n" "$DBUPGRADETIMEOUT"
+
+DBUPGRADESTATUS="timeout"
+SECONDS=0
+while [ "$SECONDS" -lt "$DBUPGRADETIMEOUT" ]; do
+    ZBXSERVERLOG="$(podman logs "$ZBXSERVERNAME-server" 2>&1)"
+    if printf "%s" "$ZBXSERVERLOG" | grep -q "database upgrade failed"; then
+        DBUPGRADESTATUS="failed"
+        break
+    fi
+    if printf "%s" "$ZBXSERVERLOG" | grep -q "server #0 started"; then
+        DBUPGRADESTATUS="done"
+        break
+    fi
+    sleep 10
+done
+
+if [ "$DBUPGRADESTATUS" = "done" ]; then
+    # Reverts log_bin_trust_function_creators at runtime and for the next MySQL restarts
+    podman exec -e MYSQL_PWD="$DBROOTPASS" "$ZBXSERVERNAME-mysql" \
+        mysql -uroot -e "SET GLOBAL log_bin_trust_function_creators = 0;" \
+        && rm -f "$DBUPGRADECNF" \
+        && printf "\nZabbix database ready. log_bin_trust_function_creators set back to 0\n"
+else
+    printf "\nZabbix database creation/upgrade %s. log_bin_trust_function_creators remains 1\n" "$DBUPGRADESTATUS"
+    printf "Check the log: podman logs -f %s-server\n" "$ZBXSERVERNAME"
+    printf "When finished, run:\n"
+    printf "  podman exec -it %s-mysql mysql -uroot -p -e \"SET GLOBAL log_bin_trust_function_creators = 0;\"\n" "$ZBXSERVERNAME"
+    printf "  rm -f \"%s\"\n" "$DBUPGRADECNF"
+fi
 
 printf "\nZabbix Pod started at http://$(hostname -I | cut -d ' ' -f 1):%s\n\n" "$PORTWEB"
