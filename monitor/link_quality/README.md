@@ -57,7 +57,7 @@ A manual address list is configured for each host to obtain the ICMP destination
 
 ---
 
-#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing)
 
 ---
 

@@ -28,7 +28,7 @@ This is a simple template that checks the records deleted by the Housekeeper pro
 ---
 ### ➡️ [Download](./zabbix_housekeeper_template_v7415.yaml)
 ---
-#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing)
 ---
 
 <BR>

@@ -34,7 +34,7 @@ This is a simple template that discovers multiple files in a directory. It is ba
 ---
 ### ➡️ [Download](./windows_file_by_zabbix_agent.yaml)
 ---
-#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing)
 ---
 
 <BR>

@@ -120,7 +120,7 @@ This media type has only been tested with Zabbix 7.4 and WhatsApp GOWA 7.8.0. Ho
 [wa_gowa]: https://github.com/aldinokemal/go-whatsapp-web-multidevice
 [license]: https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff
 [version]: https://img.shields.io/badge/Version-743-blue?logo=zotero&color=0aa8d2
-[import_media]: https://www.zabbix.com/documentation/current/en/manual/xml_export_import/media
+[import_media]: https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/media
 [http_proxy]: https://www.zabbix.com/documentation/current/en/manual/config/items/itemtypes/http#configuration
 [create_actions]: https://www.zabbix.com/documentation/current/en/manual/config/notifications/action
 [user_config]: https://www.zabbix.com/documentation/current/en/manual/config/users_and_usergroups/user

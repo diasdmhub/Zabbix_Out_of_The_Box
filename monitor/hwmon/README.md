@@ -147,5 +147,5 @@ Tested with AMD and Intel hosts running Zabbix Agent 2.
 
 [hwmon]: https://docs.kernel.org/hwmon/index.html
 [template_file]: ./linux_hwmon_template_v7415.yaml
-[import_templates]: https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing
+[import_templates]: https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing
 [license]: ./../../LICENSE

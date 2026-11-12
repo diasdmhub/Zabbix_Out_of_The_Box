@@ -30,7 +30,7 @@ For more information, see [WTTR Help](https://wttr.in/:help) and [WTTR GitHub's]
 ---
 ### ➡️ [Download](./wttr_http_template_v721.yaml)
 ---
-#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing)
 ---
 
 <BR>

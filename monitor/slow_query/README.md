@@ -30,7 +30,7 @@ This template collects the slow query statistics from the Zabbix Server log with
 ---
 ### ➡️ [Download](./zabbix_slow_query_template_v722.yaml)
 ---
-#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates#importing)
+#### ➡️ [*How to import templates*](https://www.zabbix.com/documentation/current/en/manual/config/xml_export_import/templates#importing)
 ---
 
 <BR>
