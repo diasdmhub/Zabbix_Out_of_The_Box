@@ -15,6 +15,7 @@ A collection of Zabbix templates designed to assist in the efficient management 
 - [HWmon Sensors template](./hwmon/)
 - [Link Quality template](./link_quality/)
 - [NVR Intelbras / Dahua by SNMP template](https://github.com/diasdmhub/Intelbras_NVR_Zabbix_Template)
+- [Public IP Address template](./public_ip/)
 - [Windows Files Discovery template](./dir_list/)
 - [WTTR.in template](./wttr/)
 - [Zabbix Housekeeper template](./housekeeper/)

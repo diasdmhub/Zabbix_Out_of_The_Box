@@ -1,0 +1,164 @@
+zabbix_export:
+  version: '8.0'
+  template_groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: 77db11034c96431b94e394eced31d820
+      template: 'Public IP Address by HTTP'
+      name: 'Public IP Address by HTTP'
+      description: |
+        This template is meant to collect public IP address information from an external perspective. It checks IPv4 and IPv6 against a public provider that returns the IP origin information.
+        
+        Cloudflare is the default provider but can be modified using macros.
+        
+        ⚠️ If the provider is changed, item preprocessing may be necessary, as the raw data response is likely to be different.
+        
+        Cloudflare's "cdn-cgi" endpoint identifies the Cloudflare Point of Presence (PoP) serving the requests.
+        Since the request URL uses the IPv4/IPv6 literal, the origin IPv4/IPv6 is returned and there is no DNS lookup.
+        
+        Reference:
+        https://developers.cloudflare.com/fundamentals/reference/cdn-cgi-endpoint/
+      vendor:
+        name: diasdm
+        version: 8.0-0
+      groups:
+        - name: Templates/Modules
+      items:
+        - uuid: a40fd099f6dc4bc4b868983e9c668019
+          name: 'Public Address IPv4'
+          type: HTTP_AGENT
+          key: 'public.address[ipv4]'
+          delay: 1h
+          history: 365d
+          value_type: CHAR
+          description: |
+            IPv4 address checked from an external provider endpoint.
+            
+            Cloudflare's "cdn-cgi" endpoint identifies the Cloudflare Point of Presence (PoP) serving the requests.
+            Since the request URL uses the IPv4/IPv6 literal, the origin IPv4/IPv6 is returned and there is no DNS lookup.
+          inventory_link: URL_A
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '{$INT.PROVIDER.REGEX}'
+                - \1
+            - type: MATCHES_REGEX
+              parameters:
+                - '^\d{1,3}(\.\d{1,3}){3}$'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid IPv4 address'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          url: '{$INT.PROVIDER.SCHEMA}://{$INT.PROVIDER.IPV4}{$INT.PROVIDER.ENDPOINT}'
+          verify_peer: 'YES'
+          verify_host: 'YES'
+          tags:
+            - tag: IP
+              value: IPv4
+          triggers:
+            - uuid: ae1c1f0b24d54f63861dac59ca9da57b
+              expression: 'change(/Public IP Address by HTTP/public.address[ipv4])=1'
+              name: 'Public Address Changed IPv4'
+              event_name: 'IPv4 Public Address Changed - Current: {ITEM.VALUE} - Previous: {?last(/{HOST.HOST}/public.address[ipv4],#2)}'
+              opdata: 'IP: {ITEM.LASTVALUE}'
+              priority: INFO
+              description: 'The IPv4 public address was changed recently'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: IPv4
+                  value: changed
+            - uuid: 162a75325cdf41df813d4265b94cf40a
+              expression: 'nodata(/Public IP Address by HTTP/public.address[ipv4],25h)=1'
+              name: 'Public Address Unavailable IPv4'
+              event_name: 'Unavailable IPv4 Public Address - Previous: {?last(/{HOST.HOST}/public.address[ipv4],#2)}'
+              opdata: 'IP: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: |
+                The IPv4 public address is unavailable
+                
+                A healthy address check stores at least one value a day, so silence means the provider or the address family is broken or unavailable.
+              manual_close: 'YES'
+              tags:
+                - tag: IPv4
+                  value: unavailable
+        - uuid: 77e2d712ee1048c383e46e49f30e7e0f
+          name: 'Public Address IPv6'
+          type: HTTP_AGENT
+          key: 'public.address[ipv6]'
+          delay: 1h
+          history: 365d
+          value_type: CHAR
+          description: |
+            IPv6 address checked from an external provider endpoint.
+            
+            Cloudflare's "cdn-cgi" endpoint identifies the Cloudflare Point of Presence (PoP) serving the requests.
+            Since the request URL uses the IPv4/IPv6 literal, the origin IPv4/IPv6 is returned and there is no DNS lookup.
+          inventory_link: URL_B
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '{$INT.PROVIDER.REGEX}'
+                - \1
+            - type: MATCHES_REGEX
+              parameters:
+                - '^[0-9a-fA-F:]+$'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid IPv6 address'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          url: '{$INT.PROVIDER.SCHEMA}://{$INT.PROVIDER.IPV6}{$INT.PROVIDER.ENDPOINT}'
+          verify_peer: 'YES'
+          verify_host: 'YES'
+          tags:
+            - tag: IP
+              value: IPv6
+          triggers:
+            - uuid: daba98ec254c4243a4dd347119e2c7f1
+              expression: 'change(/Public IP Address by HTTP/public.address[ipv6])=1'
+              name: 'Public Address Changed IPv6'
+              event_name: 'IPv6 Public Address Changed - Current: {ITEM.VALUE} - Previous: {?last(/{HOST.HOST}/public.address[ipv6],#2)}'
+              opdata: 'IP: {ITEM.LASTVALUE}'
+              priority: INFO
+              description: 'The IPv6 public address was changed recently'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: IPv6
+                  value: changed
+            - uuid: 49630f2d25d54328bdbefeff60b710c2
+              expression: 'nodata(/Public IP Address by HTTP/public.address[ipv6],25h)=1'
+              name: 'Public Address Unavailable IPv6'
+              event_name: 'Unavailable IPv6 Public Address - Previous: {?last(/{HOST.HOST}/public.address[ipv6],#2)}'
+              opdata: 'IP: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: |
+                The IPv6 public address is unavailable
+                
+                A healthy address check stores at least one value a day, so silence means the provider or the address family is broken or unavailable.
+              manual_close: 'YES'
+              tags:
+                - tag: IPv6
+                  value: unavailable
+      tags:
+        - tag: Internet
+          value: IP
+      macros:
+        - macro: '{$INT.PROVIDER.ENDPOINT}'
+          value: /cdn-cgi/trace
+          description: 'Provider URL endpoint for the request'
+        - macro: '{$INT.PROVIDER.IPV4}'
+          value: 1.1.1.1
+          description: 'Provider URL IPv4 address or domain name for the request'
+        - macro: '{$INT.PROVIDER.IPV6}'
+          value: '[2606:4700:4700::1111]'
+          description: 'Provider URL IPv6 address or domain name for the request. Use brackets for IPv6 literals'
+        - macro: '{$INT.PROVIDER.REGEX}'
+          value: '(?m)^ip=(\S+)$'
+          description: 'Regular expression to extract IP information from the provider raw response'
+        - macro: '{$INT.PROVIDER.SCHEMA}'
+          value: https
+          description: 'Provider http or https URL schema'

@@ -25,6 +25,7 @@ This could be referenced as a knowledge base (KB) for Zabbix scenarios, issues o
 - [HWmon Sensors template](./monitor/hwmon/)
 - [Link Quality template](./monitor/link_quality/)
 - [NVR Intelbras / Dahua by SNMP template](https://github.com/diasdmhub/Intelbras_NVR_Zabbix_Template)
+- [Public IP Address template](./monitor/public_ip/)
 - [Windows Files Discovery template](./monitor/dir_list/)
 - [WTTR.in template](./monitor/wttr/)
 - [Zabbix Housekeeper template](./monitor/housekeeper/)
