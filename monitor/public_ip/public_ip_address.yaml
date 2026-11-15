@@ -73,7 +73,7 @@ zabbix_export:
             - uuid: 162a75325cdf41df813d4265b94cf40a
               expression: 'nodata(/Public IP Address by HTTP/public.address[ipv4],25h)=1'
               name: 'Public Address Unavailable IPv4'
-              event_name: 'Unavailable IPv4 Public Address - Previous: {?last(/{HOST.HOST}/public.address[ipv4],#2)}'
+              event_name: 'Unavailable IPv4 Public Address'
               opdata: 'IP: {ITEM.LASTVALUE}'
               priority: WARNING
               description: |
@@ -132,7 +132,7 @@ zabbix_export:
             - uuid: 49630f2d25d54328bdbefeff60b710c2
               expression: 'nodata(/Public IP Address by HTTP/public.address[ipv6],25h)=1'
               name: 'Public Address Unavailable IPv6'
-              event_name: 'Unavailable IPv6 Public Address - Previous: {?last(/{HOST.HOST}/public.address[ipv6],#2)}'
+              event_name: 'Unavailable IPv6 Public Address'
               opdata: 'IP: {ITEM.LASTVALUE}'
               priority: WARNING
               description: |
