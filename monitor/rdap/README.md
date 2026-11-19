@@ -1,13 +1,17 @@
 | [↩️ Back](../) |
 | --- |
 
-# Zabbix Template for Domain RDAP
+# Zabbix Template for Domain RDAP (_deprecated_)
 
 <div align="right">
 
 [![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Version](https://img.shields.io/badge/Version-702-blue?logo=zotero&color=0aa8d2)](./domain_rdap_by_http.yaml)
 
 </div>
+
+<BR>
+
+> **⚠️ Deprecated in favor of the newer "out-of-the-box" [official RDAP Zabbix template](https://www.zabbix.com/integrations/domain_rdap).**
 
 <BR>
 
