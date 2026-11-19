@@ -11,7 +11,7 @@
 
 <BR>
 
-> **⚠️ Deprecated in favor of the newer "out-of-the-box" [official RDAP Zabbix template](https://www.zabbix.com/integrations/domain_rdap).**
+> **⚠️ Deprecated in favor of the newer, official "out-of-the-box" [official RDAP Zabbix template](https://www.zabbix.com/integrations/domain_rdap).**
 
 <BR>
 
